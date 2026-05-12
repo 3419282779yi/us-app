@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -6,581 +6,316 @@
 <title>我们之间</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="我们之间">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💑</text></svg>">
 <style>
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: #faf8f5;
-  color: #3d322b;
-  max-width: 430px;
-  margin: 0 auto;
-  min-height: 100vh;
-  min-height: 100dvh;
-  position: relative;
-  overflow-x: hidden;
-  padding-bottom: 80px;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-font-smoothing: antialiased;
+*,*::before,*::after{ margin:0; padding:0; box-sizing:border-box; }
+body{
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background:#faf8f5; color:#3d322b; max-width:430px; margin:0 auto;
+  min-height:100vh; min-height:100dvh; overflow-x:hidden; padding-bottom:80px;
+  -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased;
 }
-input, textarea, button { font-family: inherit; }
-input, textarea { font-size: 16px; }
+input,textarea,button{ font-family:inherit; }
+input,textarea{ font-size:16px; }
 
-/* Header */
-.header {
-  padding: 14px 20px 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  background: rgba(250,248,245,0.94);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  z-index: 10;
+/* header */
+.header{
+  padding:14px 20px 10px; display:flex; justify-content:space-between; align-items:center;
+  position:sticky; top:0; background:rgba(250,248,245,0.94); backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px); z-index:10;
 }
-.header h1 { font-size: 20px; font-weight: 640; letter-spacing: 0.5px; color: #5b3a29; }
-.header-right { display: flex; align-items: center; gap: 6px; }
-.sync-pill {
-  font-size: 10px;
-  padding: 3px 10px;
-  border-radius: 10px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+.header h1{ font-size:19px; font-weight:640; letter-spacing:.5px; color:#5b3a29; }
+.header-right{ display:flex; align-items:center; gap:8px; }
+.sync-dot{
+  width:8px; height:8px; border-radius:50%; flex-shrink:0;
 }
-.sync-pill.on { background: #d4edda; color: #3a6b45; }
-.sync-pill.off { background: #f0e6da; color: #8b6f56; }
-.sync-pill.loading { background: #fff3cd; color: #8b6914; animation: shim 1.2s infinite; }
-@keyframes shim { 50% { opacity: 0.5; } }
-
-.identity-badge {
-  font-size: 11px;
-  padding: 4px 12px;
-  border-radius: 12px;
-  background: #f0e6da;
-  color: #8b6f56;
-  cursor: pointer;
-  border: none;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+.sync-dot.on{ background:#4caf50; }
+.sync-dot.off{ background:#c4b5a5; }
+.sync-dot.loading{ background:#f0c040; animation:blink .8s infinite; }
+@keyframes blink{ 50%{ opacity:.3; } }
+.my-name-tag{
+  font-size:11px; padding:3px 10px; border-radius:10px; background:#fef9f5; color:#d4855e;
+  font-weight:500; letter-spacing:.5px; border:1px solid #f0d5c0;
 }
-.identity-badge.partner { background: #fce4d6; color: #c5703c; }
-
-/* Tab bar */
-.tab-bar {
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 430px;
-  display: flex;
-  justify-content: space-around;
-  background: rgba(255,255,255,0.96);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid #e8dfd5;
-  padding: 4px 0 env(safe-area-inset-bottom, 4px);
-  z-index: 10;
-}
-.tab-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  padding: 4px 10px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  color: #c4b5a5;
-  font-size: 10px;
-  font-weight: 500;
-  transition: color 0.2s;
-  min-width: 52px;
-}
-.tab-btn.on { color: #d4855e; }
-.tab-btn .ico { font-size: 22px; line-height: 1; }
-
-/* Pages */
-.page { display: none; padding: 0 20px 24px; animation: fadeIn 0.2s ease; }
-.page.show { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-/* Toast */
-.toast {
-  position: fixed;
-  top: 56px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #5b3a29;
-  color: #fff;
-  padding: 7px 18px;
-  border-radius: 20px;
-  font-size: 12px;
-  z-index: 300;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-  font-weight: 500;
-}
-.toast.show { opacity: 1; }
-
-/* === SETUP OVERLAY === */
-.setup-mask {
-  position: fixed;
-  inset: 0;
-  background: #faf8f5;
-  z-index: 500;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 28px;
-}
-.setup-mask.hidden { display: none; }
-.setup-box {
-  background: #fff;
-  border-radius: 24px;
-  padding: 32px 24px;
-  width: 100%;
-  max-width: 360px;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.06);
-  text-align: center;
-}
-.setup-box .logo { font-size: 52px; margin-bottom: 6px; }
-.setup-box h2 { font-size: 22px; color: #5b3a29; margin-bottom: 4px; font-weight: 640; }
-.setup-box .desc { font-size: 12px; color: #8b6f56; margin-bottom: 20px; line-height: 1.6; }
-.setup-box .field { margin-bottom: 12px; text-align: left; }
-.setup-box .field label { font-size: 12px; color: #8b6f56; margin-bottom: 3px; display: block; font-weight: 500; }
-.setup-box .field input {
-  width: 100%;
-  padding: 11px 14px;
-  border: 1px solid #e8dfd5;
-  border-radius: 10px;
-  font-size: 15px;
-  text-align: center;
-  letter-spacing: 0.5px;
-  outline: none;
-  background: #faf8f5;
-  transition: border-color 0.2s;
-}
-.setup-box .field input:focus { border-color: #d4855e; }
-.setup-box .btn {
-  width: 100%;
-  padding: 13px;
-  border: none;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  letter-spacing: 0.5px;
-  transition: opacity 0.15s;
-}
-.setup-box .btn:active { opacity: 0.7; }
-.setup-box .btn.primary { background: #d4855e; color: #fff; margin-top: 6px; }
-.setup-box .btn.ghost { background: none; color: #d4855e; border: 1px solid #d4855e; margin-top: 8px; }
-.setup-divider {
-  color: #c4b5a5;
-  font-size: 11px;
-  margin: 14px 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.setup-divider::before, .setup-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #e8dfd5;
+.btn-gear{
+  background:none; border:none; cursor:pointer; font-size:18px; padding:2px 4px; line-height:1;
 }
 
-/* === COUNTDOWN === */
-.cd-card {
-  background: linear-gradient(145deg, #5b3a29 0%, #7a4f38 100%);
-  border-radius: 22px;
-  padding: 32px 24px 28px;
-  color: #fff;
-  text-align: center;
-  margin-top: 4px;
-  box-shadow: 0 12px 40px rgba(91,58,41,0.18);
+/* tabs */
+.tab-bar{
+  position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+  width:100%; max-width:430px; display:flex; justify-content:space-around;
+  background:rgba(255,255,255,0.96); backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-top:1px solid #e8dfd5; padding:4px 0 env(safe-area-inset-bottom,4px); z-index:10;
 }
-.cd-card .cd-label { font-size: 12px; opacity: 0.78; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; }
-.cd-card .cd-num { font-size: 72px; font-weight: 180; line-height: 1; margin: 10px 0 6px; letter-spacing: -3px; }
-.cd-card .cd-date { font-size: 13px; opacity: 0.7; }
-.cd-set { text-align: center; margin-top: 14px; }
-.cd-set button { background: none; border: none; color: #d4855e; font-size: 13px; cursor: pointer; font-weight: 500; }
+.tab-btn{
+  display:flex; flex-direction:column; align-items:center; gap:1px; padding:4px 8px;
+  border:none; background:none; cursor:pointer; color:#c4b5a5; font-size:10px;
+  font-weight:500; transition:color .2s; min-width:50px;
+}
+.tab-btn.on{ color:#d4855e; }
+.tab-btn .ico{ font-size:22px; line-height:1; }
 
-.sec-title {
-  font-size: 14px;
-  font-weight: 640;
-  color: #5b3a29;
-  margin: 22px 0 10px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  letter-spacing: 0.3px;
-}
-.plan-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  background: #fff;
-  border-radius: 12px;
-  margin-bottom: 7px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-  transition: transform 0.15s;
-}
-.plan-row:active { transform: scale(0.985); }
-.plan-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #d4c5b5; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; color: transparent; transition: all 0.2s; }
-.plan-dot.ok { background: #d4855e; border-color: #d4855e; color: #fff; }
-.plan-txt { flex:1; font-size: 14px; }
-.plan-del { color: #c4b5a5; font-size: 14px; cursor: pointer; padding: 2px 4px; }
-.add-row { display: flex; gap: 8px; margin-top: 6px; }
-.add-row input {
-  flex:1; padding: 11px 14px; border: 1px solid #e8dfd5; border-radius: 10px;
-  outline: none; background: #fff; font-size: 14px; transition: border-color 0.2s;
-}
-.add-row input:focus { border-color: #d4855e; }
-.add-row button {
-  padding: 11px 18px; background: #d4855e; color: #fff; border: none;
-  border-radius: 10px; font-size: 14px; cursor: pointer; font-weight: 500; white-space: nowrap;
-}
-.add-row button:active { opacity: 0.75; }
+/* pages */
+.page{ display:none; padding:0 20px 24px; animation:fadeIn .2s ease; }
+.page.show{ display:block; }
+@keyframes fadeIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
+.sec-title{ font-size:14px; font-weight:640; color:#5b3a29; margin:22px 0 10px; letter-spacing:.3px; }
 
-/* === MOOD === */
-.mood-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-top: 4px;
+/* toast */
+.toast{
+  position:fixed; top:56px; left:50%; transform:translateX(-50%); background:#5b3a29;
+  color:#fff; padding:7px 18px; border-radius:20px; font-size:12px; z-index:400;
+  opacity:0; pointer-events:none; transition:opacity .3s; font-weight:500;
 }
-.mood-tile {
-  background: #fff;
-  border-radius: 16px;
-  padding: 18px 10px;
-  text-align: center;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: all 0.2s;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
-  -webkit-tap-highlight-color: transparent;
-}
-.mood-tile:active { transform: scale(0.94); }
-.mood-tile.sel { border-color: #d4855e; background: #fef9f5; }
-.mood-tile .emo { font-size: 34px; line-height: 1; }
-.mood-tile .lbl { font-size: 11px; color: #8b6f56; margin-top: 4px; font-weight: 500; }
+.toast.show{ opacity:1; }
 
-.partner-box {
-  margin-top: 22px;
-  padding: 20px;
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
-  text-align: center;
+/* ===== LOGIN OVERLAY ===== */
+.login-mask{
+  position:fixed; inset:0; background:#faf8f5; z-index:500;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; padding:28px;
 }
-.partner-box .plbl { font-size: 13px; color: #8b6f56; font-weight: 500; margin-bottom: 8px; }
-.partner-box .pemo { font-size: 56px; line-height: 1; padding: 6px; }
-.partner-acts { display: flex; gap: 8px; margin-top: 14px; }
-.partner-acts button {
-  flex:1; padding: 10px 6px; border-radius: 10px; border: 1px solid #e8dfd5;
-  background: #fff; font-size: 12px; cursor: pointer; font-weight: 500; transition: background 0.15s;
+.login-box{
+  background:#fff; border-radius:24px; padding:32px 24px; width:100%; max-width:340px;
+  box-shadow:0 4px 32px rgba(0,0,0,0.06); text-align:center;
 }
-.partner-acts button:active { background: #fef9f5; }
+.login-box .logo{ font-size:52px; margin-bottom:6px; }
+.login-box h2{ font-size:22px; color:#5b3a29; margin-bottom:4px; font-weight:640; }
+.login-box .desc{ font-size:12px; color:#8b6f56; margin-bottom:20px; line-height:1.6; }
+.login-box input{
+  width:100%; padding:12px 14px; border:1px solid #e8dfd5; border-radius:12px;
+  font-size:16px; text-align:center; outline:none; background:#faf8f5;
+  transition:border-color .2s; margin-bottom:14px;
+}
+.login-box input:focus{ border-color:#d4855e; }
+.login-box .btn{
+  width:100%; padding:13px; border:none; border-radius:12px; font-size:15px;
+  font-weight:600; cursor:pointer; letter-spacing:.5px; background:#d4855e; color:#fff;
+}
+.login-box .btn:active{ opacity:.7; }
+.login-box .hint{ font-size:11px; color:#c4b5a5; margin-top:10px; line-height:1.5; }
 
-/* === DAILY Q === */
-.dq-card {
-  background: #fff;
-  border-radius: 20px;
-  padding: 26px 20px;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  margin-top: 4px;
+/* ===== SETTINGS MODAL ===== */
+.modal-mask{
+  position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index:400;
+  display:flex; align-items:flex-end; justify-content:center;
 }
-.dq-badge {
-  font-size: 10px; letter-spacing: 2px; color: #d4855e; margin-bottom: 10px;
-  text-transform: uppercase; font-weight: 600;
+.modal-sheet{
+  background:#fff; border-radius:20px 20px 0 0; padding:24px 20px 32px;
+  width:100%; max-width:430px; animation:slideUp .25s ease;
 }
-.dq-text { font-size: 17px; font-weight: 500; line-height: 1.55; color: #3d322b; margin-bottom: 18px; }
-.dq-ans { display: flex; gap: 8px; }
-.dq-ans input {
-  flex:1; padding: 12px 14px; border: 1px solid #e8dfd5; border-radius: 12px;
-  outline: none; background: #faf8f5; font-size: 14px;
+@keyframes slideUp{ from{ transform:translateY(100%); } to{ transform:translateY(0); } }
+.modal-sheet h3{ font-size:16px; margin-bottom:14px; color:#5b3a29; font-weight:640; }
+.modal-sheet label{ font-size:12px; color:#8b6f56; display:block; margin-bottom:2px; }
+.modal-sheet input{
+  width:100%; padding:12px 14px; border:1px solid #e8dfd5; border-radius:10px;
+  font-size:15px; margin-bottom:10px; outline:none; background:#faf8f5;
 }
-.dq-ans input:focus { border-color: #d4855e; }
-.dq-ans button {
-  padding: 12px 20px; background: #d4855e; color: #fff; border: none;
-  border-radius: 12px; font-size: 14px; cursor: pointer; font-weight: 500;
-}
-.dq-ans button:active { opacity: 0.75; }
-.dq-reveal {
-  margin-top: 16px; padding: 16px; background: #fef9f5; border-radius: 12px;
-  display: none; text-align: left;
-}
-.dq-reveal.show { display: block; }
-.dq-reveal .line { font-size: 14px; margin-bottom: 5px; line-height: 1.5; }
-.dq-reveal .who { font-size: 11px; color: #8b6f56; font-weight: 500; }
+.modal-sheet input:focus{ border-color:#d4855e; }
+.modal-btns{ display:flex; gap:8px; margin-top:6px; }
+.modal-btns button{ flex:1; padding:13px; border-radius:12px; font-size:14px; cursor:pointer; border:none; font-weight:500; }
+.modal-btns .ok{ background:#d4855e; color:#fff; }
+.modal-btns .cancel{ background:#f0e6da; color:#8b6f56; }
 
-/* === FRAGMENTS === */
-.frag-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-top: 4px;
+/* ===== COUNTDOWN ===== */
+.cd-card{
+  background:linear-gradient(145deg,#5b3a29,#7a4f38); border-radius:22px;
+  padding:32px 24px 28px; color:#fff; text-align:center; margin-top:4px;
+  box-shadow:0 12px 40px rgba(91,58,41,0.18);
 }
-.frag-cell {
-  aspect-ratio: 1;
-  background: #e8dfd5;
-  border-radius: 14px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 30px;
-  transition: transform 0.15s;
+.cd-card .cd-label{ font-size:12px; opacity:.78; letter-spacing:2px; font-weight:500; }
+.cd-card .cd-num{ font-size:72px; font-weight:180; line-height:1; margin:10px 0 6px; letter-spacing:-3px; }
+.cd-card .cd-date{ font-size:13px; opacity:.7; }
+.cd-set{ text-align:center; margin-top:14px; }
+.cd-set button{ background:none; border:none; color:#d4855e; font-size:13px; cursor:pointer; font-weight:500; }
+
+.plan-row{
+  display:flex; align-items:center; gap:10px; padding:12px 14px;
+  background:#fff; border-radius:12px; margin-bottom:7px; box-shadow:0 1px 3px rgba(0,0,0,0.03);
 }
-.frag-cell:active { transform: scale(0.94); }
-.frag-add {
-  aspect-ratio: 1;
-  background: #fff;
-  border: 2px dashed #e8dfd5;
-  border-radius: 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #c4b5a5;
-  font-size: 11px;
-  font-weight: 500;
-  transition: border-color 0.2s;
-  gap: 2px;
+.plan-dot{
+  width:20px; height:20px; border-radius:50%; border:2px solid #d4c5b5; cursor:pointer;
+  flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px;
+  color:transparent; transition:all .2s;
 }
-.frag-add .big { font-size: 26px; font-weight: 300; }
-.frag-x {
-  position: absolute;
-  top: 4px; right: 4px;
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  background: rgba(0,0,0,0.45);
-  color: #fff;
-  border: none;
-  font-size: 10px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
+.plan-dot.ok{ background:#d4855e; border-color:#d4855e; color:#fff; }
+.plan-txt{ flex:1; font-size:14px; }
+.plan-del{ color:#c4b5a5; font-size:14px; cursor:pointer; padding:2px 4px; }
+.add-row{ display:flex; gap:8px; margin-top:6px; }
+.add-row input{
+  flex:1; padding:11px 14px; border:1px solid #e8dfd5; border-radius:10px;
+  outline:none; background:#fff; font-size:14px;
+}
+.add-row input:focus{ border-color:#d4855e; }
+.add-row button{
+  padding:11px 18px; background:#d4855e; color:#fff; border:none;
+  border-radius:10px; font-size:14px; cursor:pointer; font-weight:500; white-space:nowrap;
 }
 
-/* === FUND === */
-.fund-top {
-  background: linear-gradient(145deg, #d4855e 0%, #e8a57a 100%);
-  border-radius: 22px;
-  padding: 24px;
-  color: #fff;
-  text-align: center;
-  margin-top: 4px;
-  box-shadow: 0 12px 40px rgba(212,133,94,0.22);
+/* ===== MOOD ===== */
+.mood-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:4px; }
+.mood-tile{
+  background:#fff; border-radius:16px; padding:18px 10px; text-align:center; cursor:pointer;
+  border:2px solid transparent; transition:all .2s; box-shadow:0 1px 4px rgba(0,0,0,0.03);
 }
-.fund-top .flbl { font-size: 12px; opacity: 0.85; letter-spacing: 2px; font-weight: 500; }
-.fund-top .famt { font-size: 60px; font-weight: 180; line-height: 1; margin: 6px 0 2px; }
-.fund-top .famt em { font-size: 16px; font-weight: 400; font-style: normal; }
+.mood-tile:active{ transform:scale(0.94); }
+.mood-tile.sel{ border-color:#d4855e; background:#fef9f5; }
+.mood-tile .emo{ font-size:34px; line-height:1; }
+.mood-tile .lbl{ font-size:11px; color:#8b6f56; margin-top:4px; font-weight:500; }
+.mood-duo{ display:flex; gap:12px; margin-top:20px; }
+.mood-card{
+  flex:1; background:#fff; border-radius:18px; padding:18px 12px;
+  text-align:center; box-shadow:0 1px 4px rgba(0,0,0,0.03);
+}
+.mood-card .who{ font-size:11px; color:#8b6f56; font-weight:500; margin-bottom:6px; }
+.mood-card .big{ font-size:44px; line-height:1; padding:4px; }
 
-.act-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 4px; }
-.act-card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 16px 12px;
-  text-align: center;
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-  border: 2px solid transparent;
-  transition: all 0.15s;
+/* ===== DAILY Q ===== */
+.dq-card{
+  background:#fff; border-radius:20px; padding:26px 20px; text-align:center;
+  box-shadow:0 2px 8px rgba(0,0,0,0.04); margin-top:4px;
 }
-.act-card:active { border-color: #d4855e; transform: scale(0.97); }
-.act-card .emo { font-size: 30px; }
-.act-card .lab { font-size: 13px; font-weight: 500; margin: 3px 0 1px; }
-.act-card .pts { font-size: 11px; color: #d4855e; font-weight: 500; }
+.dq-badge{ font-size:10px; letter-spacing:2px; color:#d4855e; margin-bottom:10px; font-weight:600; }
+.dq-text{ font-size:17px; font-weight:500; line-height:1.55; color:#3d322b; margin-bottom:18px; }
+.dq-ans{ display:flex; gap:8px; }
+.dq-ans input{ flex:1; padding:12px 14px; border:1px solid #e8dfd5; border-radius:12px; outline:none; background:#faf8f5; }
+.dq-ans input:focus{ border-color:#d4855e; }
+.dq-ans button{ padding:12px 20px; background:#d4855e; color:#fff; border:none; border-radius:12px; font-size:14px; cursor:pointer; font-weight:500; }
+.dq-reveal{ margin-top:16px; padding:16px; background:#fef9f5; border-radius:12px; display:none; text-align:left; }
+.dq-reveal.show{ display:block; }
+.dq-reveal .line{ font-size:14px; margin-bottom:5px; line-height:1.5; }
+.dq-reveal .who{ font-size:11px; color:#8b6f56; font-weight:500; }
 
-.hist-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  background: #fff;
-  border-radius: 10px;
-  margin-bottom: 5px;
-  font-size: 13px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+/* ===== FRAGMENTS ===== */
+.frag-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:4px; }
+.frag-cell{
+  aspect-ratio:1; background:#e8dfd5; border-radius:14px; cursor:pointer;
+  overflow:hidden; display:flex; align-items:center; justify-content:center;
+  font-size:30px; transition:transform .15s; position:relative;
 }
-.hist-item .val { font-weight: 600; }
-.hist-item .val.plus { color: #d4855e; }
-.hist-item .val.minus { color: #7a4f38; }
+.frag-cell:active{ transform:scale(0.94); }
+.frag-cell img{ width:100%; height:100%; object-fit:cover; }
+.frag-cell .who-tag{
+  position:absolute; bottom:4px; left:4px; font-size:9px; padding:1px 6px;
+  border-radius:6px; background:rgba(0,0,0,0.5); color:#fff; max-width:calc(100% - 8px);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.frag-add{
+  aspect-ratio:1; background:#fff; border:2px dashed #e8dfd5; border-radius:14px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  cursor:pointer; color:#c4b5a5; font-size:11px; font-weight:500; gap:2px;
+}
+.frag-add .big{ font-size:26px; }
+.btn-del-frag{
+  position:absolute; top:3px; right:3px; width:18px; height:18px; border-radius:50%;
+  background:rgba(0,0,0,0.5); color:#fff; border:none; font-size:10px;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1;
+}
 
-/* === WISHLIST === */
-.wish-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  background: #fff;
-  border-radius: 14px;
-  margin-bottom: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+/* ===== FUND ===== */
+.fund-cards{ display:flex; gap:12px; margin-top:4px; }
+.fund-card{
+  flex:1; border-radius:18px; padding:20px 14px; text-align:center; color:#fff;
+  box-shadow:0 8px 28px rgba(0,0,0,0.12);
 }
-.wish-icon {
-  width: 48px; height: 48px;
-  background: #faf8f5;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  flex-shrink: 0;
-}
-.wish-body { flex:1; min-width: 0; }
-.wish-body .wn { font-size: 14px; font-weight: 500; }
-.wish-body .wm { font-size: 11px; color: #8b6f56; margin-top: 1px; }
-.wish-tag {
-  font-size: 10px;
-  padding: 3px 8px;
-  border-radius: 8px;
-  font-weight: 500;
-  flex-shrink: 0;
-}
-.wish-tag.want { background: #f0e6da; color: #8b6f56; }
-.wish-tag.buying { background: #fef9f5; color: #d4855e; }
-.wish-tag.bought { background: #e8dfd5; color: #5b3a29; }
-.wish-act {
-  font-size: 10px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  border: 1px solid #d4855e;
-  background: #fff;
-  color: #d4855e;
-  cursor: pointer;
-  font-weight: 500;
-  white-space: nowrap;
-}
-.btn-add {
-  width: 100%;
-  padding: 14px;
-  border: 2px dashed #e8dfd5;
-  border-radius: 14px;
-  background: #fff;
-  font-size: 13px;
-  color: #c4b5a5;
-  cursor: pointer;
-  font-weight: 500;
-  transition: border-color 0.2s;
-}
-.btn-add:hover { border-color: #d4855e; }
+.fund-card.me{ background:linear-gradient(145deg,#d4855e,#e8a57a); }
+.fund-card.ta{ background:linear-gradient(145deg,#7a4f38,#9b6d50); }
+.fund-card .fwho{ font-size:11px; opacity:.85; letter-spacing:1px; font-weight:500; }
+.fund-card .famt{ font-size:42px; font-weight:200; line-height:1; margin:6px 0 2px; }
+.fund-card .famt em{ font-size:13px; font-style:normal; font-weight:400; }
 
-/* === MODAL === */
-.modal-mask {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.35);
-  z-index: 400;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
+.act-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:4px; }
+.act-card{
+  background:#fff; border-radius:14px; padding:16px 12px; text-align:center; cursor:pointer;
+  box-shadow:0 1px 3px rgba(0,0,0,0.03); border:2px solid transparent; transition:all .15s;
 }
-.modal-sheet {
-  background: #fff;
-  border-radius: 20px 20px 0 0;
-  padding: 24px 20px 32px;
-  width: 100%;
-  max-width: 430px;
-  animation: slideUp 0.25s ease;
+.act-card:active{ border-color:#d4855e; transform:scale(0.97); }
+.act-card .emo{ font-size:30px; }
+.act-card .lab{ font-size:13px; font-weight:500; margin:3px 0 1px; }
+.act-card .pts{ font-size:11px; font-weight:500; }
+.act-card .pts.earn{ color:#d4855e; }
+.act-card .pts.spend{ color:#7a4f38; }
+
+.hist-item{
+  display:flex; align-items:center; justify-content:space-between; padding:10px 14px;
+  background:#fff; border-radius:10px; margin-bottom:5px; font-size:13px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.03);
 }
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.modal-sheet h3 { font-size: 16px; margin-bottom: 14px; color: #5b3a29; font-weight: 640; }
-.modal-sheet input {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid #e8dfd5;
-  border-radius: 10px;
-  font-size: 15px;
-  margin-bottom: 10px;
-  outline: none;
-  background: #faf8f5;
-  transition: border-color 0.2s;
+.hist-item .val{ font-weight:600; }
+.hist-item .val.earn{ color:#d4855e; }
+.hist-item .val.spend{ color:#7a4f38; }
+
+/* ===== WISHLIST ===== */
+.wish-row{
+  display:flex; align-items:center; gap:10px; padding:12px 14px; background:#fff;
+  border-radius:14px; margin-bottom:8px; box-shadow:0 1px 3px rgba(0,0,0,0.03);
 }
-.modal-sheet input:focus { border-color: #d4855e; }
-.modal-btns { display: flex; gap: 8px; }
-.modal-btns button {
-  flex:1; padding: 13px; border-radius: 12px; font-size: 14px;
-  cursor: pointer; border: none; font-weight: 500;
-}
-.modal-btns .ok { background: #d4855e; color: #fff; }
-.modal-btns .cancel { background: #f0e6da; color: #8b6f56; }
+.wish-icon{ width:48px; height:48px; background:#faf8f5; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+.wish-body{ flex:1; min-width:0; }
+.wish-body .wn{ font-size:14px; font-weight:500; }
+.wish-body .wm{ font-size:11px; color:#8b6f56; margin-top:1px; }
+.wish-tag{ font-size:10px; padding:3px 8px; border-radius:8px; font-weight:500; flex-shrink:0; }
+.wish-tag.want{ background:#f0e6da; color:#8b6f56; }
+.wish-tag.buying{ background:#fef9f5; color:#d4855e; }
+.wish-tag.bought{ background:#e8dfd5; color:#5b3a29; }
+.wish-act{ font-size:10px; padding:4px 8px; border-radius:6px; border:1px solid #d4855e; background:#fff; color:#d4855e; cursor:pointer; font-weight:500; white-space:nowrap; }
+.btn-add{ width:100%; padding:14px; border:2px dashed #e8dfd5; border-radius:14px; background:#fff; font-size:13px; color:#c4b5a5; cursor:pointer; font-weight:500; }
 </style>
 </head>
 <body>
 
-<!-- === SETUP (first-run) === -->
-<div class="setup-mask" id="setupScreen">
-  <div class="setup-box">
+<!-- ===== LOGIN ===== -->
+<div class="login-mask" id="loginScreen">
+  <div class="login-box">
     <div class="logo">💑</div>
     <h2>我们之间</h2>
-    <p class="desc" id="setupDesc">两个人的小空间</p>
-
-    <div id="setupSectionA">
-      <div class="field">
-        <label>你们的配对码</label>
-        <input type="text" id="setupPairCode" placeholder="比如：xiaoming-xiaohong" maxlength="30" autocomplete="off">
-      </div>
-      <button class="btn primary" onclick="setupContinue()">进入</button>
-      <div class="setup-divider">可选：设置云同步</div>
-      <button class="btn ghost" onclick="showSetupSupabase()">配置 Supabase 同步数据</button>
-    </div>
-
-    <div id="setupSectionB" style="display:none;">
-      <div class="field">
-        <label>Supabase URL</label>
-        <input type="text" id="setupSUrl" placeholder="https://xxxxx.supabase.co" autocomplete="off">
-      </div>
-      <div class="field">
-        <label>Supabase Anon Key</label>
-        <input type="text" id="setupSKey" placeholder="anon key" autocomplete="off">
-      </div>
-      <button class="btn primary" onclick="finishSetup()">完成设置</button>
-      <button class="btn ghost" onclick="hideSetupSupabase()">跳过，使用离线模式</button>
-    </div>
+    <p class="desc">输入你的名字进入</p>
+    <input type="text" id="loginName" placeholder="你的名字" maxlength="20" autocomplete="off">
+    <button class="btn" onclick="doLogin()">进入</button>
+    <p class="hint">你和 TA 各用各的名字<br>比如她输入 lixiang，你输入 zhangyi</p>
   </div>
 </div>
 
-<!-- === HEADER === -->
+<!-- ===== HEADER ===== -->
 <div class="header">
   <h1>我们之间</h1>
   <div class="header-right">
-    <span class="sync-pill off" id="syncPill" onclick="openSettings()" style="cursor:pointer;" title="点击设置同步">离线</span>
-    <button class="identity-badge" id="idBadge" onclick="switchId()">我是我</button>
-    <button style="background:none;border:none;cursor:pointer;font-size:18px;padding:2px 4px;" onclick="openSettings()" title="设置">⚙</button>
+    <span class="sync-dot off" id="syncDot" title="同步状态"></span>
+    <span class="my-name-tag" id="nameTag">我</span>
+    <button class="btn-gear" onclick="openSettings()" title="设置">⚙</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- Settings Modal -->
+<!-- ===== SETTINGS MODAL ===== -->
 <div class="modal-mask" id="settingsModal" style="display:none;">
   <div class="modal-sheet">
     <h3>同步设置</h3>
-    <label style="font-size:12px;color:#8b6f56;display:block;margin-bottom:2px;">配对码</label>
-    <input type="text" id="setPairCode" placeholder="你们的配对码" maxlength="30">
-    <label style="font-size:12px;color:#8b6f56;display:block;margin-bottom:2px;margin-top:4px;">Supabase URL</label>
+    <label>配对码</label>
+    <input type="text" id="setPairCode" placeholder="两人的配对码" maxlength="30">
+    <label>Supabase URL</label>
     <input type="text" id="setUrl" placeholder="https://xxxxx.supabase.co">
-    <label style="font-size:12px;color:#8b6f56;display:block;margin-bottom:2px;margin-top:4px;">Supabase Anon Key</label>
+    <label>Supabase Anon Key</label>
     <input type="text" id="setKey" placeholder="anon key">
-    <div class="modal-btns" style="margin-top:6px;">
+    <div class="modal-btns">
       <button class="cancel" onclick="closeSettings()">取消</button>
       <button class="ok" onclick="saveSettings()">保存并同步</button>
     </div>
+    <p style="font-size:11px;color:#c4b5a5;text-align:center;margin-top:12px;">你的名字: <span id="settingsName"></span></p>
+  </div>
+</div>
+
+<!-- ===== WISHLIST MODAL ===== -->
+<div class="modal-mask" id="wishModal" style="display:none;">
+  <div class="modal-sheet">
+    <h3>添加心愿</h3>
+    <input type="text" id="wmName" placeholder="想要什么？">
+    <input type="text" id="wmEmoji" placeholder="emoji（可选）" maxlength="2">
+    <input type="text" id="wmPrice" placeholder="大概价格（可选）">
+    <input type="text" id="wmLink" placeholder="链接（可选）">
+    <div class="modal-btns"><button class="cancel" onclick="closeWish()">取消</button><button class="ok" onclick="addWish()">添加</button></div>
   </div>
 </div>
 
@@ -591,7 +326,7 @@ input, textarea { font-size: 16px; }
   <div class="cd-card">
     <div class="cd-label">距离下次见面</div>
     <div class="cd-num" id="cdNum">--</div>
-    <div class="cd-date" id="cdDate">请先设置见面日期</div>
+    <div class="cd-date" id="cdDate">请设置见面日期</div>
   </div>
   <div class="cd-set"><button onclick="pickDate()">设置下次见面日期</button></div>
   <div class="sec-title">想一起做的事</div>
@@ -606,12 +341,14 @@ input, textarea { font-size: 16px; }
 <div class="page" id="pg-mood">
   <p style="font-size:12px;color:#8b6f56;margin:4px 0 14px;">今天的心情</p>
   <div class="mood-grid" id="moodGrid"></div>
-  <div class="partner-box">
-    <div class="plbl" id="pmLabel">TA 今天的心情</div>
-    <div class="pemo" id="pmEmoji">🌙</div>
-    <div class="partner-acts">
-      <button onclick="toastMsg('去微信跟 TA 说句话吧~')">发个消息</button>
-      <button onclick="toastMsg('有时候，听到声音就是最好的安慰')">打个电话</button>
+  <div class="mood-duo">
+    <div class="mood-card">
+      <div class="who" id="moodLabelMe">我</div>
+      <div class="big" id="moodEmojiMe">🌙</div>
+    </div>
+    <div class="mood-card">
+      <div class="who" id="moodLabelTa">TA</div>
+      <div class="big" id="moodEmojiTa">🌙</div>
     </div>
   </div>
 </div>
@@ -626,8 +363,8 @@ input, textarea { font-size: 16px; }
       <button onclick="submitAnswer()">回答</button>
     </div>
     <div class="dq-reveal" id="dqReveal">
-      <div class="line"><span class="who">我的回答：</span><span id="dqMy"></span></div>
-      <div class="line"><span class="who">TA 的回答：</span><span id="dqPartner"></span></div>
+      <div class="line"><span class="who" id="dqWhoMe">我：</span><span id="dqMy"></span></div>
+      <div class="line"><span class="who" id="dqWhoTa">TA：</span><span id="dqPartner"></span></div>
     </div>
   </div>
 </div>
@@ -636,19 +373,26 @@ input, textarea { font-size: 16px; }
 <div class="page" id="pg-fragments">
   <p style="font-size:12px;color:#8b6f56;margin:4px 0 10px;">随手记录，让 TA 看到你的日常</p>
   <div class="frag-grid" id="fragGrid">
-    <div class="frag-add" onclick="addFrag()"><span class="big">+</span>碎片</div>
+    <div class="frag-add" onclick="openFragPicker()"><span class="big">+</span>碎片</div>
   </div>
+  <input type="file" id="fragFileInput" accept="image/*" style="display:none" onchange="onFragFilePicked(event)">
 </div>
 
 <!-- FUND -->
 <div class="page" id="pg-fund">
-  <div class="fund-top">
-    <div class="flbl">见面基金</div>
-    <div class="famt" id="fundAmt">0<em> 枚</em></div>
+  <div class="fund-cards">
+    <div class="fund-card me">
+      <div class="fwho" id="fundLabelMe">我</div>
+      <div class="famt" id="fundMe">0<em> 枚</em></div>
+    </div>
+    <div class="fund-card ta">
+      <div class="fwho" id="fundLabelTa">TA</div>
+      <div class="famt" id="fundTa">0<em> 枚</em></div>
+    </div>
   </div>
-  <div class="sec-title">赚取</div>
+  <div class="sec-title" id="earnTitle">我赚取</div>
   <div class="act-grid" id="earnGrid"></div>
-  <div class="sec-title">兑换</div>
+  <div class="sec-title" id="redeemTitle">我兑换</div>
   <div class="act-grid" id="redeemGrid"></div>
   <div class="sec-title">记录</div>
   <div id="fundHist"></div>
@@ -658,10 +402,10 @@ input, textarea { font-size: 16px; }
 <div class="page" id="pg-wishlist">
   <p style="font-size:12px;color:#8b6f56;margin:4px 0 10px;">写下想要的小心愿，TA 会悄悄看到</p>
   <div id="wishList"></div>
-  <button class="btn-add" onclick="showWishModal()">+ 添加心愿</button>
+  <button class="btn-add" onclick="openWish()">+ 添加心愿</button>
 </div>
 
-<!-- === TAB BAR === -->
+<!-- ===== TAB BAR ===== -->
 <div class="tab-bar">
   <button class="tab-btn on" onclick="goPage('countdown')"><span class="ico">⏳</span>见面</button>
   <button class="tab-btn" onclick="goPage('mood')"><span class="ico">💡</span>心情</button>
@@ -672,28 +416,27 @@ input, textarea { font-size: 16px; }
 </div>
 
 <script>
-// ========================= 全局状态 =========================
+// ==================== 全局 ====================
 const D = {
   meetDate: null,
   plans: [],
-  moodMe: null,
-  moodPartner: null,
+  moods: {},        // { "zhangyi": 2, "lixiang": null }
   qDate: '',
-  qAnswerMe: '',
-  qAnswerPartner: '',
-  fragments: [],
-  fundBalance: 0,
-  fundHistory: [],
-  wishlist: [],
-  identity: 'self',
+  answers: {},      // { "zhangyi": "xxx", "lixiang": "xxx" }
+  fragments: [],    // [{ who, text, emoji, img, date }]
+  funds: {},        // { "zhangyi": 10, "lixiang": 5 }
+  fundHistory: [],  // [{ who, label, amount, time }]
+  wishlist: [],     // shared
 };
 
-let supabase = null;
+let MY_NAME = '';
+let PARTNER_NAME = '';
 let currentPage = 'countdown';
 let syncTimer = null;
-const LC = 'us_data_v2';
+const LC = 'us_data_v3';
+const LC_MY = 'us_myname';
 
-// ========================= 存储 =========================
+// ==================== 本地存储 ====================
 function localLoad() {
   try {
     const raw = localStorage.getItem(LC);
@@ -704,10 +447,7 @@ function localSave() {
   try { localStorage.setItem(LC, JSON.stringify(D)); } catch(e) {}
 }
 
-// ========================= Supabase =========================
-let SB_URL = '';
-let SB_KEY = '';
-
+// ==================== Supabase ====================
 function getSBConfig() {
   return {
     url: localStorage.getItem('us_sb_url') || '',
@@ -720,26 +460,17 @@ function saveSBConfig(url, key, code) {
   localStorage.setItem('us_sb_key', key);
   localStorage.setItem('us_sb_code', code);
 }
-
 function sbReady() {
-  const cfg = getSBConfig();
-  return !!(cfg.url && cfg.key && cfg.code);
-}
-
-function initSB() {
-  const cfg = getSBConfig();
-  if (!cfg.url || !cfg.key) return false;
-  SB_URL = cfg.url; SB_KEY = cfg.key;
-  supabase = true;
-  return true;
+  const c = getSBConfig();
+  return !!(c.url && c.key && c.code);
 }
 
 async function cloudLoad() {
   if (!sbReady()) return null;
-  const cfg = getSBConfig();
+  const c = getSBConfig();
   try {
-    const resp = await fetch(cfg.url + '/rest/v1/couples?select=data&pair_code=eq.' + encodeURIComponent(cfg.code) + '&limit=1', {
-      headers: { 'apikey': cfg.key, 'Authorization': 'Bearer ' + cfg.key }
+    const resp = await fetch(c.url + '/rest/v1/couples?select=data&pair_code=eq.' + encodeURIComponent(c.code) + '&limit=1', {
+      headers: { 'apikey': c.key, 'Authorization': 'Bearer ' + c.key }
     });
     if (!resp.ok) return null;
     const rows = await resp.json();
@@ -747,9 +478,11 @@ async function cloudLoad() {
     const d = rows[0].data;
     if (!d) return null;
     if (d.meetDate || (d.plans && d.plans.length > 0) ||
-        d.moodMe != null || d.moodPartner != null ||
-        (d.fragments && d.fragments.length > 0) || d.fundBalance > 0 ||
-        (d.wishlist && d.wishlist.length > 0) || d.qAnswerMe || d.qAnswerPartner) {
+        (d.moods && Object.keys(d.moods).length > 0) ||
+        (d.fragments && d.fragments.length > 0) ||
+        (d.funds && (d.funds[MY_NAME] > 0 || (PARTNER_NAME && d.funds[PARTNER_NAME] > 0))) ||
+        (d.wishlist && d.wishlist.length > 0) ||
+        (d.answers && Object.keys(d.answers).length > 0)) {
       return d;
     }
     return null;
@@ -758,36 +491,24 @@ async function cloudLoad() {
 
 async function cloudSave() {
   if (!sbReady()) return false;
-  const cfg = getSBConfig();
+  const c = getSBConfig();
   try {
-    // 先查是否存在
-    const check = await fetch(cfg.url + '/rest/v1/couples?select=id&pair_code=eq.' + encodeURIComponent(cfg.code) + '&limit=1', {
-      headers: { 'apikey': cfg.key, 'Authorization': 'Bearer ' + cfg.key }
+    const check = await fetch(c.url + '/rest/v1/couples?select=id&pair_code=eq.' + encodeURIComponent(c.code) + '&limit=1', {
+      headers: { 'apikey': c.key, 'Authorization': 'Bearer ' + c.key }
     });
     const rows = check.ok ? await check.json() : [];
-    const body = { pair_code: cfg.code, data: D, updated_at: new Date().toISOString() };
+    const body = { pair_code: c.code, data: D, updated_at: new Date().toISOString() };
     let resp;
     if (rows && rows.length > 0) {
-      // 已存在 → 更新
-      resp = await fetch(cfg.url + '/rest/v1/couples?pair_code=eq.' + encodeURIComponent(cfg.code), {
+      resp = await fetch(c.url + '/rest/v1/couples?pair_code=eq.' + encodeURIComponent(c.code), {
         method: 'PATCH',
-        headers: {
-          'apikey': cfg.key,
-          'Authorization': 'Bearer ' + cfg.key,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'apikey': c.key, 'Authorization': 'Bearer ' + c.key, 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
     } else {
-      // 不存在 → 插入
-      resp = await fetch(cfg.url + '/rest/v1/couples', {
+      resp = await fetch(c.url + '/rest/v1/couples', {
         method: 'POST',
-        headers: {
-          'apikey': cfg.key,
-          'Authorization': 'Bearer ' + cfg.key,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal'
-        },
+        headers: { 'apikey': c.key, 'Authorization': 'Bearer ' + c.key, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
         body: JSON.stringify(body)
       });
     }
@@ -795,59 +516,49 @@ async function cloudSave() {
   } catch(e) { return false; }
 }
 
-function updateSyncUI(status) {
-  const pill = document.getElementById('syncPill');
-  pill.className = 'sync-pill ' + status;
-  pill.textContent = status === 'on' ? '已同步' : status === 'loading' ? '同步中' : '离线';
+function updateSync(status) {
+  const dot = document.getElementById('syncDot');
+  dot.className = 'sync-dot ' + status;
 }
 
-// 检查数据是否有实际内容（而非空壳）
-function hasContent(dataObj) {
-  if (!dataObj) return false;
-  return !!(dataObj.meetDate ||
-    (dataObj.plans && dataObj.plans.length > 0) ||
-    dataObj.moodMe != null || dataObj.moodPartner != null ||
-    (dataObj.fragments && dataObj.fragments.length > 0) ||
-    dataObj.fundBalance > 0 ||
-    (dataObj.wishlist && dataObj.wishlist.length > 0) ||
-    dataObj.qAnswerMe || dataObj.qAnswerPartner);
-}
-
-// ========================= 身份 =========================
-function switchId() {
-  D.identity = D.identity === 'self' ? 'partner' : 'self';
-  persistAndSync();
-  const b = document.getElementById('idBadge');
-  if (D.identity === 'self') { b.textContent = '我是我'; b.className = 'identity-badge'; }
-  else { b.textContent = '我是 TA'; b.className = 'identity-badge partner'; }
-  renderCurrent();
-}
-
-// ========================= 持久化 =========================
 async function persistAndSync() {
   localSave();
-  if (supabase) {
-    updateSyncUI('loading');
+  if (sbReady()) {
+    updateSync('loading');
     const ok = await cloudSave();
-    updateSyncUI(ok ? 'on' : 'off');
+    updateSync(ok ? 'on' : 'off');
   }
 }
 
-async function pullFromCloud() {
-  if (!supabase) return;
-  const cloud = await cloudLoad();
-  if (!cloud) return;
-  // 本地有内容、云端也有内容 → 用云端覆盖（云端是双方合写的最新版本）
-  // 本地有内容、云端是空壳 → cloudLoad 已过滤，不会进这里
-  // 本地空、云端有内容 → 正常覆盖
-  const id = D.identity;
-  Object.assign(D, cloud);
-  D.identity = id;
-  localSave();
-  updateSyncUI('on');
+// ==================== 登录 ====================
+function doLogin() {
+  const name = document.getElementById('loginName').value.trim();
+  if (!name) { alert('请输入你的名字'); return; }
+  MY_NAME = name;
+  localStorage.setItem(LC_MY, name);
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('nameTag').textContent = name;
+  // 初始化空的 funds/moods
+  if (!D.funds) D.funds = {};
+  if (D.funds[name] === undefined) D.funds[name] = 0;
+  if (!D.moods) D.moods = {};
+  if (D.moods[name] === undefined) D.moods[name] = null;
+  if (!D.answers) D.answers = {};
+  if (D.answers[name] === undefined) D.answers[name] = '';
+  initAfterLogin();
 }
 
-// ========================= 页面导航 =========================
+function guessPartner() {
+  // 从 moods/funds/answers 里找另一个名字
+  const names = new Set([...Object.keys(D.moods || {}), ...Object.keys(D.funds || {}), ...Object.keys(D.answers || {})]);
+  names.delete(MY_NAME);
+  // 也检查 fragments
+  (D.fragments || []).forEach(f => { if (f.who && f.who !== MY_NAME) names.add(f.who); });
+  (D.fundHistory || []).forEach(h => { if (h.who && h.who !== MY_NAME) names.add(h.who); });
+  if (names.size > 0) PARTNER_NAME = [...names][0];
+}
+
+// ==================== 页面导航 ====================
 function goPage(name) {
   currentPage = name;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
@@ -855,7 +566,8 @@ function goPage(name) {
   const pg = document.getElementById('pg-' + name);
   if (pg) pg.classList.add('show');
   const map = { countdown:0, mood:1, dailyq:2, fragments:3, fund:4, wishlist:5 };
-  document.querySelectorAll('.tab-btn')[map[name]]?.classList.add('on');
+  const tabs = document.querySelectorAll('.tab-btn');
+  if (tabs[map[name]]) tabs[map[name]].classList.add('on');
   renderPage(name);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -864,7 +576,6 @@ function renderCurrent() { renderPage(currentPage); }
 function renderAll() {
   ['countdown','mood','dailyq','fragments','fund','wishlist'].forEach(renderPage);
 }
-
 function renderPage(name) {
   switch(name) {
     case 'countdown': rCountdown(); break;
@@ -876,7 +587,7 @@ function renderPage(name) {
   }
 }
 
-// ========================= COUNTDOWN =========================
+// ==================== COUNTDOWN ====================
 function rCountdown() {
   const num = document.getElementById('cdNum');
   const date = document.getElementById('cdDate');
@@ -884,19 +595,18 @@ function rCountdown() {
     const t = new Date(D.meetDate);
     const diff = Math.ceil((t - new Date()) / 86400000);
     num.textContent = diff > 0 ? diff : (diff === 0 ? '今天!' : '已过去');
-    if (diff > 0) date.textContent = t.toLocaleDateString('zh-CN', { month:'long', day:'numeric', weekday:'long' });
-    else if (diff === 0) date.textContent = '就是今天!';
-    else date.textContent = '期待下一次';
-  } else { num.textContent = '--'; date.textContent = '请先设置见面日期'; }
+    date.textContent = diff > 0 ? t.toLocaleDateString('zh-CN', { month:'long', day:'numeric', weekday:'long' })
+      : (diff === 0 ? '就是今天!' : '期待下一次');
+  } else { num.textContent = '--'; date.textContent = '请设置见面日期'; }
   rPlans();
 }
 function pickDate() {
   const s = prompt('输入见面日期 (YYYY-MM-DD)：', D.meetDate || '');
   if (s && /^\d{4}-\d{2}-\d{2}$/.test(s)) { D.meetDate = s; persistAndSync(); rCountdown(); }
-  else if (s) alert('格式不对，请输入 YYYY-MM-DD');
+  else if (s) alert('格式不对');
 }
 function rPlans() {
-  document.getElementById('planList').innerHTML = D.plans.map((p, i) => `
+  document.getElementById('planList').innerHTML = (D.plans || []).map((p, i) => `
     <div class="plan-row">
       <div class="plan-dot ${p.done ? 'ok' : ''}" onclick="togPlan(${i})">${p.done ? '✓' : ''}</div>
       <span class="plan-txt" style="${p.done ? 'text-decoration:line-through;color:#c4b5a5' : ''}">${esc(p.text)}</span>
@@ -906,6 +616,7 @@ function rPlans() {
 function addPlan() {
   const v = document.getElementById('planInput').value.trim();
   if (!v) return;
+  if (!D.plans) D.plans = [];
   D.plans.push({ text: v, done: false });
   document.getElementById('planInput').value = '';
   persistAndSync(); rPlans();
@@ -913,45 +624,48 @@ function addPlan() {
 function togPlan(i) { D.plans[i].done = !D.plans[i].done; persistAndSync(); rPlans(); }
 function delPlan(i) { D.plans.splice(i, 1); persistAndSync(); rPlans(); }
 
-// ========================= MOOD =========================
+// ==================== MOOD ====================
 const MOODS = [
   { e:'😊', l:'开心' }, { e:'🥰', l:'想念' }, { e:'😴', l:'疲惫' }, { e:'😤', l:'烦躁' },
   { e:'😢', l:'难过' }, { e:'🎉', l:'兴奋' }, { e:'😌', l:'平静' }, { e:'🤔', l:'思考中' },
 ];
 function rMood() {
-  const mine = D.identity === 'self' ? D.moodMe : D.moodPartner;
+  const myMood = D.moods[MY_NAME];
   document.getElementById('moodGrid').innerHTML = MOODS.map((m, i) => `
-    <div class="mood-tile ${mine === i ? 'sel' : ''}" onclick="setMood(${i})">
+    <div class="mood-tile ${myMood === i ? 'sel' : ''}" onclick="setMood(${i})">
       <div class="emo">${m.e}</div><div class="lbl">${m.l}</div>
     </div>`).join('');
-  const pm = D.identity === 'self' ? D.moodPartner : D.moodMe;
-  document.getElementById('pmLabel').textContent = D.identity === 'self' ? 'TA 今天的心情' : '我今天的心情';
-  document.getElementById('pmEmoji').textContent = pm != null ? MOODS[pm].e : '🌙';
+  document.getElementById('moodLabelMe').textContent = MY_NAME;
+  document.getElementById('moodEmojiMe').textContent = myMood != null ? MOODS[myMood].e : '🌙';
+  document.getElementById('moodLabelTa').textContent = PARTNER_NAME || 'TA';
+  const taMood = PARTNER_NAME ? D.moods[PARTNER_NAME] : null;
+  document.getElementById('moodEmojiTa').textContent = taMood != null ? MOODS[taMood].e : '🌙';
 }
 function setMood(i) {
-  if (D.identity === 'self') D.moodMe = (D.moodMe === i ? null : i);
-  else D.moodPartner = (D.moodPartner === i ? null : i);
+  D.moods[MY_NAME] = (D.moods[MY_NAME] === i ? null : i);
   persistAndSync(); rMood();
 }
 
-// ========================= DAILY Q =========================
+// ==================== DAILY Q ====================
 const QS = [
-  '今天让你最想TA的瞬间是什么？','下次见面住民宿还是酒店？','如果立刻出现在TA面前，你想做什么？',
-  'TA做过最让你感动的一件事？','最近压力大吗？想对TA说什么？','你觉得在一起最舒服的状态是？',
+  '今天让你最想TA的瞬间是什么？','下次见面想住民宿还是酒店？','如果现在出现在TA面前，你最想做什么？',
+  'TA做过最让你感动的事？','最近压力大吗？想对TA说什么？','在一起最舒服的状态是什么样？',
   '说一件今天的小事给TA听。','下次见面最想一起吃什么？','异地最难和最甜的分别是什么？',
   '用三个词形容今天的情绪。',
 ];
 function rDailyQ() {
   const today = new Date().toISOString().slice(0,10);
-  if (D.qDate !== today) { D.qDate = today; D.qAnswerMe = ''; D.qAnswerPartner = ''; persistAndSync(); }
+  if (D.qDate !== today) { D.qDate = today; D.answers = {}; persistAndSync(); }
   document.getElementById('dqQ').textContent = QS[parseInt(today.replace(/-/g,'')) % QS.length];
-  const my = D.identity === 'self' ? D.qAnswerMe : D.qAnswerPartner;
-  const pt = D.identity === 'self' ? D.qAnswerPartner : D.qAnswerMe;
-  if (my) {
+  const myAns = D.answers[MY_NAME];
+  const taAns = PARTNER_NAME ? D.answers[PARTNER_NAME] : '';
+  document.getElementById('dqWhoMe').textContent = MY_NAME + '：';
+  document.getElementById('dqWhoTa').textContent = (PARTNER_NAME || 'TA') + '：';
+  if (myAns) {
     document.getElementById('dqInputArea').style.display = 'none';
     document.getElementById('dqReveal').classList.add('show');
-    document.getElementById('dqMy').textContent = my;
-    document.getElementById('dqPartner').textContent = pt || '等待中...';
+    document.getElementById('dqMy').textContent = myAns;
+    document.getElementById('dqPartner').textContent = taAns || '等待中...';
   } else {
     document.getElementById('dqInputArea').style.display = 'flex';
     document.getElementById('dqReveal').classList.remove('show');
@@ -961,155 +675,173 @@ function rDailyQ() {
 function submitAnswer() {
   const v = document.getElementById('dqInput').value.trim();
   if (!v) return;
-  if (D.identity === 'self') D.qAnswerMe = v;
-  else D.qAnswerPartner = v;
+  D.answers[MY_NAME] = v;
   persistAndSync(); rDailyQ();
 }
 
-// ========================= FRAGMENTS =========================
+// ==================== FRAGMENTS ====================
 function rFragments() {
-  let h = D.fragments.map((f, i) => `
+  let h = (D.fragments || []).map((f, i) => `
     <div class="frag-cell" onclick="viewFrag(${i})">
-      <span>${f.emoji || '📝'}</span>
-      <button class="frag-x" onclick="event.stopPropagation();delFrag(${i})">✕</button>
+      ${f.img ? '<img src="' + f.img + '" alt="">' : '<span>' + (f.emoji || '📝') + '</span>'}
+      <span class="who-tag">${f.who || ''}</span>
+      ${f.who === MY_NAME ? '<button class="btn-del-frag" onclick="event.stopPropagation();delFrag(' + i + ')">✕</button>' : ''}
     </div>`).join('');
-  h += '<div class="frag-add" onclick="addFrag()"><span class="big">+</span>碎片</div>';
+  h += '<div class="frag-add" onclick="openFragPicker()"><span class="big">+</span>碎片</div>';
   document.getElementById('fragGrid').innerHTML = h;
 }
-function addFrag() {
-  const v = prompt('记录一个瞬间：');
-  if (!v || !v.trim()) return;
-  const t = v.trim();
-  D.fragments.push({ text: t, emoji: t.length <= 4 ? t : '📝', date: new Date().toISOString() });
-  persistAndSync(); rFragments();
+function openFragPicker() {
+  document.getElementById('fragFileInput').click();
+}
+function onFragFilePicked(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const text = prompt('给这张照片加句话（可选）：');
+    if (!D.fragments) D.fragments = [];
+    D.fragments.push({
+      who: MY_NAME,
+      text: text || '',
+      emoji: '📷',
+      img: ev.target.result,
+      date: new Date().toISOString()
+    });
+    persistAndSync(); rFragments();
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
 }
 function viewFrag(i) {
-  alert('💌 ' + D.fragments[i].text + '\n\n' + new Date(D.fragments[i].date).toLocaleDateString('zh-CN'));
+  const f = D.fragments[i];
+  alert((f.who ? f.who + '：' : '') + (f.text || '分享了一张照片') + '\n\n' + new Date(f.date).toLocaleDateString('zh-CN'));
 }
-function delFrag(i) { if (confirm('删除？')) { D.fragments.splice(i, 1); persistAndSync(); rFragments(); } }
+function delFrag(i) {
+  if (confirm('删除这条碎片？')) { D.fragments.splice(i, 1); persistAndSync(); rFragments(); }
+}
 
-// ========================= FUND =========================
+// ==================== FUND ====================
 const EARNS = [
   { e:'💪', l:'忍住没吵架', p:2 }, { e:'📹', l:'主动视频', p:3 },
   { e:'💌', l:'写了真心话', p:3 }, { e:'☀️', l:'主动说早安', p:1 },
 ];
 const REDEEMS = [
-  { e:'🧋', l:'请喝奶茶', c:5 }, { e:'💆', l:'按摩十分钟', c:8 },
-  { e:'🎬', l:'选下次电影', c:3 }, { e:'🍳', l:'做一道菜', c:10 },
+  { e:'🧋', l:'让对方请奶茶', c:5 }, { e:'💆', l:'让对方按摩', c:8 },
+  { e:'🎬', l:'选下次电影', c:3 }, { e:'🍳', l:'让对方做菜', c:10 },
 ];
 function rFund() {
-  document.getElementById('fundAmt').innerHTML = `${D.fundBalance}<em> 枚</em>`;
+  document.getElementById('fundLabelMe').textContent = MY_NAME;
+  document.getElementById('fundLabelTa').textContent = PARTNER_NAME || 'TA';
+  document.getElementById('fundMe').innerHTML = (D.funds[MY_NAME] || 0) + '<em> 枚</em>';
+  document.getElementById('fundTa').innerHTML = (PARTNER_NAME ? (D.funds[PARTNER_NAME] || 0) : 0) + '<em> 枚</em>';
+
+  document.getElementById('earnTitle').textContent = MY_NAME + ' 赚取';
   document.getElementById('earnGrid').innerHTML = EARNS.map((f,i) => `
-    <div class="act-card" onclick="doEarn(${i})"><div class="emo">${f.e}</div><div class="lab">${f.l}</div><div class="pts">+${f.p} 枚</div></div>`).join('');
+    <div class="act-card" onclick="doEarn(${i})"><div class="emo">${f.e}</div><div class="lab">${f.l}</div><div class="pts earn">+${f.p} 枚</div></div>`).join('');
+
+  document.getElementById('redeemTitle').textContent = MY_NAME + ' 兑换';
   document.getElementById('redeemGrid').innerHTML = REDEEMS.map((f,i) => `
-    <div class="act-card" onclick="doRedeem(${i})"><div class="emo">${f.e}</div><div class="lab">${f.l}</div><div class="pts">-${f.c} 枚</div></div>`).join('');
+    <div class="act-card" onclick="doRedeem(${i})"><div class="emo">${f.e}</div><div class="lab">${f.l}</div><div class="pts spend">-${f.c} 枚</div></div>`).join('');
+
   const hist = document.getElementById('fundHist');
-  if (!D.fundHistory.length) {
+  if (!D.fundHistory || !D.fundHistory.length) {
     hist.innerHTML = '<p style="color:#c4b5a5;font-size:12px;text-align:center;padding:14px;">还没有记录</p>';
   } else {
-    hist.innerHTML = D.fundHistory.slice().reverse().slice(0, 10).map(h => `
-      <div class="hist-item"><span>${h.label}</span><span class="val ${h.amount > 0 ? 'plus' : 'minus'}">${h.amount>0?'+':''}${h.amount} 枚</span></div>`).join('');
+    hist.innerHTML = D.fundHistory.slice().reverse().slice(0, 15).map(h => `
+      <div class="hist-item"><span>${h.who || ''} ${h.label}</span><span class="val ${h.amount > 0 ? 'earn' : 'spend'}">${h.amount>0?'+':''}${h.amount} 枚</span></div>`).join('');
   }
 }
 function doEarn(i) {
-  const f = EARNS[i]; D.fundBalance += f.p;
-  D.fundHistory.push({ label: f.l, amount: f.p, time: Date.now() });
+  const f = EARNS[i];
+  if (!D.funds) D.funds = {};
+  if (!D.funds[MY_NAME]) D.funds[MY_NAME] = 0;
+  D.funds[MY_NAME] += f.p;
+  if (!D.fundHistory) D.fundHistory = [];
+  D.fundHistory.push({ who: MY_NAME, label: f.l, amount: f.p, time: Date.now() });
   persistAndSync(); rFund();
 }
 function doRedeem(i) {
   const f = REDEEMS[i];
-  if (D.fundBalance < f.c) { alert('基金不够哦~'); return; }
-  D.fundBalance -= f.c;
-  D.fundHistory.push({ label: f.l, amount: -f.c, time: Date.now() });
+  if (!D.funds[MY_NAME] || D.funds[MY_NAME] < f.c) { alert('你的基金不够哦，再攒攒~'); return; }
+  D.funds[MY_NAME] -= f.c;
+  if (!D.fundHistory) D.fundHistory = [];
+  D.fundHistory.push({ who: MY_NAME, label: f.l + '（TA获得）', amount: -f.c, time: Date.now() });
   persistAndSync(); rFund();
-  toastMsg('兑换成功！见面时兑现吧~');
+  alert('兑换成功！见面时兑现吧~');
 }
 
-// ========================= WISHLIST =========================
+// ==================== WISHLIST ====================
 function rWishlist() {
   const c = document.getElementById('wishList');
-  if (!D.wishlist.length) {
+  if (!D.wishlist || !D.wishlist.length) {
     c.innerHTML = '<p style="color:#c4b5a5;font-size:12px;text-align:center;padding:18px;">还没有心愿</p>';
     return;
   }
   c.innerHTML = D.wishlist.map((w, i) => {
-    const tags = { want: '想要', buying: '准备中', bought: '已实现' };
+    const tags = { want:'想要', buying:'准备中', bought:'已实现' };
+    const isMine = w.addedBy === MY_NAME;
     return `<div class="wish-row">
       <div class="wish-icon">${w.emoji || '🎁'}</div>
       <div class="wish-body"><div class="wn">${esc(w.name)}</div>
-        <div class="wm">${w.price ? '¥'+w.price : ''}${w.price&&w.link?' · ':''}${w.link ? '🔗 有链接' : ''}</div>
+        <div class="wm">${w.price ? '¥'+w.price : ''}${w.price&&w.link?' · ':''}${w.link?'🔗 有链接':''}${w.addedBy ? ' · 来自'+w.addedBy : ''}</div>
       </div>
       <span class="wish-tag ${w.status}">${tags[w.status]}</span>
-      ${D.identity === 'partner' && w.status === 'want' ? `<button class="wish-act" onclick="markBuy(${i})">准备买</button>` : ''}
-      ${D.identity === 'self' && w.status === 'buying' ? `<button class="wish-act" style="border-color:#5b3a29;color:#5b3a29;" onclick="markBought(${i})">已实现</button>` : ''}
-      <span style="cursor:pointer;color:#c4b5a5;font-size:14px;margin-left:2px;" onclick="delWish(${i})">✕</span>
+      ${w.addedBy !== MY_NAME && w.status === 'want' ? '<button class="wish-act" onclick="markBuy(' + i + ')">我准备买</button>' : ''}
+      ${w.addedBy === MY_NAME && w.status === 'buying' ? '<button class="wish-act" style="border-color:#5b3a29;color:#5b3a29;" onclick="markBought(' + i + ')">已实现</button>' : ''}
+      ${w.addedBy === MY_NAME ? '<span style="cursor:pointer;color:#c4b5a5;font-size:14px;margin-left:2px;" onclick="delWish(' + i + ')">✕</span>' : ''}
     </div>`;
   }).join('');
 }
-function showWishModal() {
-  const m = document.createElement('div'); m.className = 'modal-mask';
-  m.innerHTML = `<div class="modal-sheet">
-    <h3>添加心愿</h3>
-    <input type="text" id="wmName" placeholder="想要什么？">
-    <input type="text" id="wmEmoji" placeholder="emoji（可选）" maxlength="2">
-    <input type="text" id="wmPrice" placeholder="大概价格（可选）">
-    <input type="text" id="wmLink" placeholder="链接（可选）">
-    <div class="modal-btns"><button class="cancel" onclick="this.closest('.modal-mask').remove()">取消</button><button class="ok" onclick="doAddWish()">添加</button></div>
-  </div>`;
-  document.body.appendChild(m);
-  m.onclick = e => { if (e.target === m) m.remove(); };
+function openWish() {
+  document.getElementById('wishModal').style.display = 'flex';
 }
-function doAddWish() {
+function closeWish() {
+  document.getElementById('wishModal').style.display = 'none';
+}
+function addWish() {
   const nm = document.getElementById('wmName').value.trim(); if (!nm) return alert('请填写心愿');
-  D.wishlist.push({ name: nm, emoji: document.getElementById('wmEmoji').value.trim() || '🎁', price: document.getElementById('wmPrice').value.trim(), link: document.getElementById('wmLink').value.trim(), status: 'want' });
-  document.querySelector('.modal-mask')?.remove();
+  if (!D.wishlist) D.wishlist = [];
+  D.wishlist.push({
+    name: nm,
+    emoji: document.getElementById('wmEmoji').value.trim() || '🎁',
+    price: document.getElementById('wmPrice').value.trim(),
+    link: document.getElementById('wmLink').value.trim(),
+    status: 'want',
+    addedBy: MY_NAME
+  });
+  closeWish();
   persistAndSync(); rWishlist();
 }
 function markBuy(i) { D.wishlist[i].status = 'buying'; persistAndSync(); rWishlist(); }
 function markBought(i) { D.wishlist[i].status = 'bought'; persistAndSync(); rWishlist(); }
 function delWish(i) { if (confirm('删除？')) { D.wishlist.splice(i, 1); persistAndSync(); rWishlist(); } }
 
-// ========================= SETUP =========================
-function showSetupSupabase() {
-  document.getElementById('setupSectionA').style.display = 'none';
-  document.getElementById('setupSectionB').style.display = 'block';
-  document.getElementById('setupDesc').textContent = '配置云同步（可选）';
+// ==================== SETTINGS ====================
+function openSettings() {
+  const c = getSBConfig();
+  document.getElementById('setPairCode').value = c.code || '';
+  document.getElementById('setUrl').value = c.url || '';
+  document.getElementById('setKey').value = c.key || '';
+  document.getElementById('settingsName').textContent = MY_NAME;
+  document.getElementById('settingsModal').style.display = 'flex';
 }
-
-function hideSetupSupabase() {
-  document.getElementById('setupSectionB').style.display = 'none';
-  document.getElementById('setupSectionA').style.display = 'block';
-  document.getElementById('setupDesc').textContent = '两个人的小空间';
-  const code = document.getElementById('setupPairCode').value.trim();
-  if (!code) { alert('请先输入配对码'); return; }
-  finishSetupNoSB(code);
+function closeSettings() {
+  document.getElementById('settingsModal').style.display = 'none';
 }
-
-function setupContinue() {
-  const code = document.getElementById('setupPairCode').value.trim();
-  if (!code) { alert('请输入你们的配对码'); return; }
-  // Check if Supabase is configured in localStorage from before
-  const cfg = getSBConfig();
-  if (cfg.url && cfg.key) {
-    finishSetupWithSB(code, cfg.url, cfg.key);
-  } else {
-    finishSetupNoSB(code);
+async function saveSettings() {
+  const code = document.getElementById('setPairCode').value.trim();
+  const url = document.getElementById('setUrl').value.trim();
+  const key = document.getElementById('setKey').value.trim();
+  if (!code) { alert('请填写配对码'); return; }
+  closeSettings();
+  if (!url || !key) {
+    saveSBConfig('', '', code);
+    updateSync('off');
+    toastMsg('离线模式');
+    return;
   }
-}
-
-function finishSetup() {
-  const url = document.getElementById('setupSUrl').value.trim();
-  const key = document.getElementById('setupSKey').value.trim();
-  const code = document.getElementById('setupPairCode').value.trim();
-  if (!code) { alert('请先在第一步输入配对码'); return; }
-  if (!url || !key) { alert('请填写 Supabase 连接信息，或点击"跳过"使用离线模式'); return; }
-  finishSetupWithSB(code, url, key);
-}
-
-async function finishSetupWithSB(code, url, key) {
-  // 测试连接
-  updateSyncUI('loading');
-  toastMsg('正在测试连接...');
+  updateSync('loading');
+  toastMsg('测试连接...');
   let ok = false;
   try {
     const resp = await fetch(url + '/rest/v1/couples?limit=1', {
@@ -1118,154 +850,133 @@ async function finishSetupWithSB(code, url, key) {
     ok = resp.ok;
     if (!ok) {
       const txt = await resp.text();
-      toastMsg('连接失败: HTTP ' + resp.status + ' - ' + txt.substring(0, 80));
+      toastMsg('连接失败 HTTP ' + resp.status);
     }
-  } catch(e) {
-    toastMsg('连接失败：网络错误，请检查 URL 是否正确');
-  }
-  if (!ok) { updateSyncUI('off'); return; }
-
+  } catch(e) { toastMsg('网络错误，检查 URL'); }
+  if (!ok) { updateSync('off'); return; }
   saveSBConfig(url, key, code);
-  initSB();
-  document.getElementById('setupScreen').classList.add('hidden');
+  updateSync('on');
   startAutoSync();
-  toastMsg('连接成功！正在同步...');
-
   const c = await cloudLoad();
-  if (c && hasContent(c)) {
+  if (c) {
     const id = D.identity;
     Object.assign(D, c);
     D.identity = id;
+    // 确保当前用户有字段
+    if (!D.funds) D.funds = {};
+    if (D.funds[MY_NAME] === undefined) D.funds[MY_NAME] = 0;
+    if (!D.moods) D.moods = {};
+    if (D.moods[MY_NAME] === undefined) D.moods[MY_NAME] = null;
+    if (!D.answers) D.answers = {};
+    if (D.answers[MY_NAME] === undefined) D.answers[MY_NAME] = '';
     localSave();
-    updateSyncUI('on');
-    toastMsg('已从云端同步数据');
-  } else if (hasContent(D)) {
-    const saved = await cloudSave();
-    updateSyncUI(saved ? 'on' : 'off');
-    if (saved) toastMsg('本地数据已上传云端');
-    else toastMsg('同步失败，请稍后重试');
+    guessPartner();
+    toastMsg('已同步云端数据');
   } else {
-    updateSyncUI('on');
+    await cloudSave();
+    toastMsg('本地数据已上传');
   }
   renderAll();
 }
 
-function finishSetupNoSB(code) {
-  saveSBConfig('', '', code);
-  document.getElementById('setupScreen').classList.add('hidden');
-  updateSyncUI('off');
-  renderAll();
-  toastMsg('离线模式，数据仅保存在本地');
-}
-
-// ========================= SETTINGS MODAL =========================
-function openSettings() {
-  const cfg = getSBConfig();
-  document.getElementById('setPairCode').value = cfg.code || '';
-  document.getElementById('setUrl').value = cfg.url || '';
-  document.getElementById('setKey').value = cfg.key || '';
-  document.getElementById('settingsModal').style.display = 'flex';
-}
-function closeSettings() {
-  document.getElementById('settingsModal').style.display = 'none';
-}
-function saveSettings() {
-  const code = document.getElementById('setPairCode').value.trim();
-  const url = document.getElementById('setUrl').value.trim();
-  const key = document.getElementById('setKey').value.trim();
-  if (!code) { alert('请填写配对码'); return; }
-  closeSettings();
-  if (url && key) {
-    finishSetupWithSB(code, url, key);
-  } else {
-    finishSetupNoSB(code);
-  }
-}
-
-// ========================= SYNC LOOP =========================
+// ==================== SYNC ====================
 function startAutoSync() {
   if (syncTimer) clearInterval(syncTimer);
   syncTimer = setInterval(async () => {
-    if (!supabase) return;
+    if (!sbReady()) return;
     const cloud = await cloudLoad();
-    if (cloud && hasContent(cloud)) {
-      const id = D.identity;
-      // 只比较云端和本地的核心数据（忽略 identity）
-      const localForCmp = Object.assign({}, D);
-      delete localForCmp.identity;
-      const cloudForCmp = Object.assign({}, cloud);
-      delete cloudForCmp.identity;
-      const changed = JSON.stringify(cloudForCmp) !== JSON.stringify(localForCmp);
-      if (changed) {
-        Object.assign(D, cloud);
-        D.identity = id;
-        localSave();
-        renderCurrent();
-        updateSyncUI('on');
-      }
+    if (!cloud) return;
+    const my = MY_NAME;
+    const changed = JSON.stringify(cloud) !== JSON.stringify(D);
+    if (changed) {
+      Object.assign(D, cloud);
+      if (!D.funds) D.funds = {};
+      if (D.funds[my] === undefined) D.funds[my] = 0;
+      if (!D.moods) D.moods = {};
+      if (D.moods[my] === undefined) D.moods[my] = null;
+      if (!D.answers) D.answers = {};
+      if (D.answers[my] === undefined) D.answers[my] = '';
+      localSave();
+      guessPartner();
+      renderCurrent();
+      updateSync('on');
     }
   }, 15000);
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && supabase) { pullFromCloud().then(() => renderCurrent()); }
+  document.addEventListener('visibilitychange', async () => {
+    if (!document.hidden && sbReady()) {
+      const cloud = await cloudLoad();
+      if (cloud) {
+        const my = MY_NAME;
+        Object.assign(D, cloud);
+        if (!D.funds[my] === undefined) D.funds[my] = 0;
+        if (!D.moods[my] === undefined) D.moods[my] = null;
+        if (!D.answers[my] === undefined) D.answers[my] = '';
+        localSave();
+        guessPartner();
+        renderCurrent();
+        updateSync('on');
+      }
+    }
   });
 }
 
-// ========================= UTILS =========================
+// ==================== INIT ====================
+function initAfterLogin() {
+  guessPartner();
+  // 确保数据结构存在
+  if (!D.funds) D.funds = {};
+  if (D.funds[MY_NAME] === undefined) D.funds[MY_NAME] = 0;
+  if (!D.moods) D.moods = {};
+  if (D.moods[MY_NAME] === undefined) D.moods[MY_NAME] = null;
+  if (!D.answers) D.answers = {};
+  if (D.answers[MY_NAME] === undefined) D.answers[MY_NAME] = '';
+  if (!D.plans) D.plans = [];
+  if (!D.fragments) D.fragments = [];
+  if (!D.fundHistory) D.fundHistory = [];
+  if (!D.wishlist) D.wishlist = [];
+
+  const c = getSBConfig();
+  if (sbReady()) {
+    updateSync('loading');
+    cloudLoad().then(cloud => {
+      if (cloud) {
+        Object.assign(D, cloud);
+        if (!D.funds[MY_NAME] === undefined) D.funds[MY_NAME] = 0;
+        localSave();
+        guessPartner();
+        updateSync('on');
+      } else {
+        cloudSave().then(ok => updateSync(ok?'on':'off'));
+      }
+      renderAll();
+      document.getElementById('nameTag').textContent = MY_NAME;
+    });
+    startAutoSync();
+  } else {
+    updateSync('off');
+    renderAll();
+    document.getElementById('nameTag').textContent = MY_NAME;
+  }
+  document.getElementById('pg-countdown').classList.add('show');
+}
+
+function init() {
+  const savedName = localStorage.getItem(LC_MY);
+  if (savedName) {
+    MY_NAME = savedName;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('nameTag').textContent = savedName;
+    localLoad();
+    initAfterLogin();
+  } else {
+    document.getElementById('loginScreen').style.display = 'flex';
+  }
+}
+
 function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 function toastMsg(m) {
   const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 1800);
-}
-
-// ========================= INIT =========================
-async function init() {
-  localLoad();
-
-  // Check if already configured
-  const cfg = getSBConfig();
-  const hasPair = !!cfg.code;
-  const hasSB = initSB();
-
-  if (hasPair) {
-    document.getElementById('setupScreen').classList.add('hidden');
-    if (hasSB) {
-      updateSyncUI('loading');
-      const cloud = await cloudLoad();
-      if (cloud && hasContent(cloud)) {
-        const id = D.identity;
-        Object.assign(D, cloud);
-        D.identity = id;
-        localSave();
-        updateSyncUI('on');
-      } else if (hasContent(D)) {
-        await cloudSave();
-        updateSyncUI('on');
-      } else {
-        updateSyncUI('on');
-      }
-      startAutoSync();
-    } else {
-      updateSyncUI('off');
-    }
-  } else {
-    document.getElementById('setupScreen').classList.remove('hidden');
-    updateSyncUI('off');
-  }
-
-  // Render
-  renderAll();
-  document.getElementById('pg-countdown').classList.add('show');
-
-  // Header double-tap to reopen config
-  document.querySelector('.header h1').style.cursor = 'pointer';
-  document.querySelector('.header h1').onclick = function(e) {
-    // triple click to reopen setup
-    if (e.detail === 3) {
-      document.getElementById('setupScreen').classList.remove('hidden');
-      document.getElementById('setupSectionA').style.display = 'block';
-      document.getElementById('setupSectionB').style.display = 'none';
-    }
-  };
+  setTimeout(() => t.classList.remove('show'), 2000);
 }
 
 init();
