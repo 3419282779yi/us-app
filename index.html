@@ -1089,34 +1089,48 @@ function finishSetup() {
   finishSetupWithSB(code, url, key);
 }
 
-function finishSetupWithSB(code, url, key) {
-  saveSBConfig(url, key, code);
-  if (!initSB()) { toastMsg('Supabase 连接失败'); return; }
-  document.getElementById('setupScreen').classList.add('hidden');
+async function finishSetupWithSB(code, url, key) {
+  // 测试连接
   updateSyncUI('loading');
-  startAutoSync();
-  cloudLoad().then(c => {
-    if (c && hasContent(c)) {
-      // 云端有数据 → 拉下来
-      const id = D.identity;
-      Object.assign(D, c);
-      D.identity = id;
-      localSave();
-      updateSyncUI('on');
-      toastMsg('已从云端同步数据');
-    } else {
-      // 云端无数据 → 把本地的推上去
-      if (hasContent(D)) {
-        cloudSave().then(ok => {
-          updateSyncUI(ok ? 'on' : 'off');
-          if (ok) toastMsg('本地数据已上传云端');
-        });
-      } else {
-        updateSyncUI('on');
-      }
+  toastMsg('正在测试连接...');
+  let ok = false;
+  try {
+    const resp = await fetch(url + '/rest/v1/couples?limit=1', {
+      headers: { 'apikey': key, 'Authorization': 'Bearer ' + key }
+    });
+    ok = resp.ok;
+    if (!ok) {
+      const txt = await resp.text();
+      toastMsg('连接失败: HTTP ' + resp.status + ' - ' + txt.substring(0, 80));
     }
-    renderAll();
-  });
+  } catch(e) {
+    toastMsg('连接失败：网络错误，请检查 URL 是否正确');
+  }
+  if (!ok) { updateSyncUI('off'); return; }
+
+  saveSBConfig(url, key, code);
+  initSB();
+  document.getElementById('setupScreen').classList.add('hidden');
+  startAutoSync();
+  toastMsg('连接成功！正在同步...');
+
+  const c = await cloudLoad();
+  if (c && hasContent(c)) {
+    const id = D.identity;
+    Object.assign(D, c);
+    D.identity = id;
+    localSave();
+    updateSyncUI('on');
+    toastMsg('已从云端同步数据');
+  } else if (hasContent(D)) {
+    const saved = await cloudSave();
+    updateSyncUI(saved ? 'on' : 'off');
+    if (saved) toastMsg('本地数据已上传云端');
+    else toastMsg('同步失败，请稍后重试');
+  } else {
+    updateSyncUI('on');
+  }
+  renderAll();
 }
 
 function finishSetupNoSB(code) {
