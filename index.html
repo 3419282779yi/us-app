@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="我们之间">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💑</text></svg>">
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 body {
@@ -531,20 +531,28 @@ input, textarea { font-size: 16px; }
     <h2>我们之间</h2>
     <p class="desc" id="setupDesc">两个人的小空间</p>
 
-    <div class="field">
-      <label>你们的配对码 *</label>
-      <input type="text" id="setupPairCode" placeholder="比如：xiaoming-xiaohong" maxlength="30" autocomplete="off">
+    <div id="setupSectionA">
+      <div class="field">
+        <label>你们的配对码</label>
+        <input type="text" id="setupPairCode" placeholder="比如：xiaoming-xiaohong" maxlength="30" autocomplete="off">
+      </div>
+      <button class="btn primary" onclick="setupContinue()">进入</button>
+      <div class="setup-divider">可选：设置云同步</div>
+      <button class="btn ghost" onclick="showSetupSupabase()">配置 Supabase 同步数据</button>
     </div>
-    <div class="field">
-      <label>Supabase URL（可选，用于云同步）</label>
-      <input type="text" id="setupSUrl" placeholder="https://xxxxx.supabase.co" autocomplete="off">
+
+    <div id="setupSectionB" style="display:none;">
+      <div class="field">
+        <label>Supabase URL</label>
+        <input type="text" id="setupSUrl" placeholder="https://xxxxx.supabase.co" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Supabase Anon Key</label>
+        <input type="text" id="setupSKey" placeholder="anon key" autocomplete="off">
+      </div>
+      <button class="btn primary" onclick="finishSetup()">完成设置</button>
+      <button class="btn ghost" onclick="hideSetupSupabase()">跳过，使用离线模式</button>
     </div>
-    <div class="field">
-      <label>Supabase Anon Key（可选）</label>
-      <input type="text" id="setupSKey" placeholder="anon key" autocomplete="off">
-    </div>
-    <button class="btn primary" onclick="finishSetup()">进入我们之间</button>
-    <p style="font-size:11px;color:#c4b5a5;margin-top:10px;">不填 Supabase 信息则为离线模式，数据仅存本地</p>
   </div>
 </div>
 
@@ -553,7 +561,6 @@ input, textarea { font-size: 16px; }
   <h1>我们之间</h1>
   <div class="header-right">
     <span class="sync-pill off" id="syncPill">离线</span>
-    <button class="identity-badge" style="margin-right:6px;cursor:pointer;background:#f0e6da;border:none;font-size:14px;padding:4px 8px;border-radius:12px;font-weight:500;color:#8b6f56;" onclick="reopenSetup();">⚙️</button>
     <button class="identity-badge" id="idBadge" onclick="switchId()">我是我</button>
   </div>
 </div>
@@ -664,6 +671,7 @@ const D = {
   identity: 'self',
 };
 
+let supabase = null;
 let currentPage = 'countdown';
 let syncTimer = null;
 const LC = 'us_data_v2';
@@ -693,45 +701,46 @@ function saveSBConfig(url, key, code) {
   localStorage.setItem('us_sb_code', code);
 }
 
-function sb() {
+function initSB() {
   const cfg = getSBConfig();
-  if (!cfg.url || !cfg.key) return null;
-  return { url: cfg.url.replace(/\/+$/, ''), key: cfg.key };
+  if (!cfg.url || !cfg.key) return false;
+  try {
+    supabase = window.supabase.createClient(cfg.url, cfg.key);
+    return true;
+  } catch(e) { return false; }
 }
 
 async function cloudLoad() {
-  const c = sb(); if (!c) return null;
-  const code = getSBConfig().code; if (!code) return null;
+  if (!supabase) return null;
+  const code = getSBConfig().code;
+  if (!code) return null;
   try {
-    const res = await fetch(
-      `${c.url}/rest/v1/couples?select=data&pair_code=eq.${encodeURIComponent(code)}`,
-      { headers: { apikey: c.key, Authorization: `Bearer ${c.key}` } }
-    );
-    if (!res.ok) return null;
-    const rows = await res.json();
-    return rows[0]?.data || null;
+    const { data: row, error } = await supabase
+      .from('couples').select('data').eq('pair_code', code).maybeSingle();
+    if (error) throw error;
+    if (!row || !row.data) return null;
+    // 如果云端数据是个空壳子（所有字段都是默认值），视为无数据
+    const d = row.data;
+    const hasContent = d.meetDate || (d.plans && d.plans.length > 0) ||
+      d.moodMe != null || d.moodPartner != null ||
+      (d.fragments && d.fragments.length > 0) || d.fundBalance > 0 ||
+      (d.wishlist && d.wishlist.length > 0) ||
+      d.qAnswerMe || d.qAnswerPartner;
+    return hasContent ? d : null;
   } catch(e) { return null; }
 }
 
 async function cloudSave() {
-  const c = sb(); if (!c) return false;
-  const code = getSBConfig().code; if (!code) return false;
+  if (!supabase) return false;
+  const code = getSBConfig().code;
+  if (!code) return false;
   try {
-    const res = await fetch(`${c.url}/rest/v1/couples`, {
-      method: 'POST',
-      headers: {
-        apikey: c.key,
-        Authorization: `Bearer ${c.key}`,
-        'Content-Type': 'application/json',
-        Prefer: 'resolution=merge-duplicates',
-      },
-      body: JSON.stringify({
-        pair_code: code,
-        data: D,
-        updated_at: new Date().toISOString()
-      }),
-    });
-    return res.ok;
+    const { error } = await supabase.from('couples').upsert({
+      pair_code: code,
+      data: D,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'pair_code' });
+    return !error;
   } catch(e) { return false; }
 }
 
@@ -739,6 +748,18 @@ function updateSyncUI(status) {
   const pill = document.getElementById('syncPill');
   pill.className = 'sync-pill ' + status;
   pill.textContent = status === 'on' ? '已同步' : status === 'loading' ? '同步中' : '离线';
+}
+
+// 检查数据是否有实际内容（而非空壳）
+function hasContent(dataObj) {
+  if (!dataObj) return false;
+  return !!(dataObj.meetDate ||
+    (dataObj.plans && dataObj.plans.length > 0) ||
+    dataObj.moodMe != null || dataObj.moodPartner != null ||
+    (dataObj.fragments && dataObj.fragments.length > 0) ||
+    dataObj.fundBalance > 0 ||
+    (dataObj.wishlist && dataObj.wishlist.length > 0) ||
+    dataObj.qAnswerMe || dataObj.qAnswerPartner);
 }
 
 // ========================= 身份 =========================
@@ -754,7 +775,7 @@ function switchId() {
 // ========================= 持久化 =========================
 async function persistAndSync() {
   localSave();
-  if (sb()) {
+  if (supabase) {
     updateSyncUI('loading');
     const ok = await cloudSave();
     updateSyncUI(ok ? 'on' : 'off');
@@ -762,9 +783,12 @@ async function persistAndSync() {
 }
 
 async function pullFromCloud() {
-  if (!sb()) return;
+  if (!supabase) return;
   const cloud = await cloudLoad();
   if (!cloud) return;
+  // 本地有内容、云端也有内容 → 用云端覆盖（云端是双方合写的最新版本）
+  // 本地有内容、云端是空壳 → cloudLoad 已过滤，不会进这里
+  // 本地空、云端有内容 → 正常覆盖
   const id = D.identity;
   Object.assign(D, cloud);
   D.identity = id;
@@ -994,59 +1018,71 @@ function markBuy(i) { D.wishlist[i].status = 'buying'; persistAndSync(); rWishli
 function markBought(i) { D.wishlist[i].status = 'bought'; persistAndSync(); rWishlist(); }
 function delWish(i) { if (confirm('删除？')) { D.wishlist.splice(i, 1); persistAndSync(); rWishlist(); } }
 
-function reopenSetup() {
-  const cfg = getSBConfig();
-  document.getElementById('setupPairCode').value = cfg.code || '';
-  document.getElementById('setupSUrl').value = cfg.url || '';
-  document.getElementById('setupSKey').value = cfg.key || '';
-  document.getElementById('setupScreen').classList.remove('hidden');
+// ========================= SETUP =========================
+function showSetupSupabase() {
+  document.getElementById('setupSectionA').style.display = 'none';
+  document.getElementById('setupSectionB').style.display = 'block';
+  document.getElementById('setupDesc').textContent = '配置云同步（可选）';
 }
 
-// ========================= SETUP =========================
-function finishSetup() {
+function hideSetupSupabase() {
+  document.getElementById('setupSectionB').style.display = 'none';
+  document.getElementById('setupSectionA').style.display = 'block';
+  document.getElementById('setupDesc').textContent = '两个人的小空间';
   const code = document.getElementById('setupPairCode').value.trim();
-  let url = document.getElementById('setupSUrl').value.trim();
-  const key = document.getElementById('setupSKey').value.trim();
+  if (!code) { alert('请先输入配对码'); return; }
+  finishSetupNoSB(code);
+}
+
+function setupContinue() {
+  const code = document.getElementById('setupPairCode').value.trim();
   if (!code) { alert('请输入你们的配对码'); return; }
-  // Clean URL: remove trailing /rest/v1 or /
-  if (url) {
-    url = url.replace(/\/rest\/v\d+\/?$/, '').replace(/\/+$/, '');
-    document.getElementById('setupSUrl').value = url;
-  }
-  if (url && key) {
-    finishSetupWithSB(code, url, key);
+  // Check if Supabase is configured in localStorage from before
+  const cfg = getSBConfig();
+  if (cfg.url && cfg.key) {
+    finishSetupWithSB(code, cfg.url, cfg.key);
   } else {
     finishSetupNoSB(code);
   }
 }
 
-async function finishSetupWithSB(code, url, key) {
+function finishSetup() {
+  const url = document.getElementById('setupSUrl').value.trim();
+  const key = document.getElementById('setupSKey').value.trim();
+  const code = document.getElementById('setupPairCode').value.trim();
+  if (!code) { alert('请先在第一步输入配对码'); return; }
+  if (!url || !key) { alert('请填写 Supabase 连接信息，或点击"跳过"使用离线模式'); return; }
+  finishSetupWithSB(code, url, key);
+}
+
+function finishSetupWithSB(code, url, key) {
   saveSBConfig(url, key, code);
-  // Test connection with a simple fetch
-  const c = sb();
-  if (!c) { alert('配置读取失败'); return; }
-  try {
-    const res = await fetch(`${c.url}/rest/v1/couples?select=id&limit=1`, {
-      headers: { apikey: c.key, Authorization: `Bearer ${c.key}` }
-    });
-    if (!res.ok) {
-      const err = await res.text();
-      alert(`连接失败 (${res.status})。\n请确认：\n1. URL 正确（不带 /rest/v1）\n2. 使用的是 anon public key\n3. SQL Editor 中已运行建表语句`);
-      return;
-    }
-  } catch(e) {
-    alert(`网络错误：${e.message}\n请检查 URL 是否正确。`);
-    return;
-  }
+  if (!initSB()) { toastMsg('Supabase 连接失败'); return; }
   document.getElementById('setupScreen').classList.add('hidden');
-  updateSyncUI('on');
+  updateSyncUI('loading');
   startAutoSync();
-  const cloud = await cloudLoad();
-  if (cloud) { const id = D.identity; Object.assign(D, cloud); D.identity = id; localSave(); }
-  else { await cloudSave(); }
-  updateSyncUI('on');
-  renderAll();
-  toastMsg('云同步已开启');
+  cloudLoad().then(c => {
+    if (c && hasContent(c)) {
+      // 云端有数据 → 拉下来
+      const id = D.identity;
+      Object.assign(D, c);
+      D.identity = id;
+      localSave();
+      updateSyncUI('on');
+      toastMsg('已从云端同步数据');
+    } else {
+      // 云端无数据 → 把本地的推上去
+      if (hasContent(D)) {
+        cloudSave().then(ok => {
+          updateSyncUI(ok ? 'on' : 'off');
+          if (ok) toastMsg('本地数据已上传云端');
+        });
+      } else {
+        updateSyncUI('on');
+      }
+    }
+    renderAll();
+  });
 }
 
 function finishSetupNoSB(code) {
@@ -1061,16 +1097,27 @@ function finishSetupNoSB(code) {
 function startAutoSync() {
   if (syncTimer) clearInterval(syncTimer);
   syncTimer = setInterval(async () => {
-    if (!sb()) return;
+    if (!supabase) return;
     const cloud = await cloudLoad();
-    if (cloud) {
+    if (cloud && hasContent(cloud)) {
       const id = D.identity;
-      const changed = JSON.stringify(cloud) !== JSON.stringify(D);
-      if (changed) { Object.assign(D, cloud); D.identity = id; localSave(); renderCurrent(); updateSyncUI('on'); }
+      // 只比较云端和本地的核心数据（忽略 identity）
+      const localForCmp = Object.assign({}, D);
+      delete localForCmp.identity;
+      const cloudForCmp = Object.assign({}, cloud);
+      delete cloudForCmp.identity;
+      const changed = JSON.stringify(cloudForCmp) !== JSON.stringify(localForCmp);
+      if (changed) {
+        Object.assign(D, cloud);
+        D.identity = id;
+        localSave();
+        renderCurrent();
+        updateSyncUI('on');
+      }
     }
-  }, 30000);
+  }, 15000);
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && sb()) { pullFromCloud().then(() => renderCurrent()); }
+    if (!document.hidden && supabase) { pullFromCloud().then(() => renderCurrent()); }
   });
 }
 
@@ -1088,14 +1135,25 @@ async function init() {
   // Check if already configured
   const cfg = getSBConfig();
   const hasPair = !!cfg.code;
-  const hasSB = !!sb();
+  const hasSB = initSB();
 
   if (hasPair) {
     document.getElementById('setupScreen').classList.add('hidden');
     if (hasSB) {
       updateSyncUI('loading');
-      await pullFromCloud();
-      updateSyncUI('on');
+      const cloud = await cloudLoad();
+      if (cloud && hasContent(cloud)) {
+        const id = D.identity;
+        Object.assign(D, cloud);
+        D.identity = id;
+        localSave();
+        updateSyncUI('on');
+      } else if (hasContent(D)) {
+        await cloudSave();
+        updateSyncUI('on');
+      } else {
+        updateSyncUI('on');
+      }
       startAutoSync();
     } else {
       updateSyncUI('off');
@@ -1112,7 +1170,12 @@ async function init() {
   // Header double-tap to reopen config
   document.querySelector('.header h1').style.cursor = 'pointer';
   document.querySelector('.header h1').onclick = function(e) {
-    if (e.detail === 3) reopenSetup();
+    // triple click to reopen setup
+    if (e.detail === 3) {
+      document.getElementById('setupScreen').classList.remove('hidden');
+      document.getElementById('setupSectionA').style.display = 'block';
+      document.getElementById('setupSectionB').style.display = 'none';
+    }
   };
 }
 
