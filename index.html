@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>我们之间</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="我们之间">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💑</text></svg>">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #faf8f5;
+  color: #3d322b;
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+  overflow-x: hidden;
+  padding-bottom: 80px;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+input, textarea, button { font-family: inherit; }
+input, textarea { font-size: 16px; }
+
+/* Header */
+.header {
+  padding: 14px 20px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background: rgba(250,248,245,0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 10;
+}
+.header h1 { font-size: 20px; font-weight: 640; letter-spacing: 0.5px; color: #5b3a29; }
+.header-right { display: flex; align-items: center; gap: 6px; }
+.sync-pill {
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+.sync-pill.on { background: #d4edda; color: #3a6b45; }
+.sync-pill.off { background: #f0e6da; color: #8b6f56; }
+.sync-pill.loading { background: #fff3cd; color: #8b6914; animation: shim 1.2s infinite; }
+@keyframes shim { 50% { opacity: 0.5; } }
+
+.identity-badge {
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  background: #f0e6da;
+  color: #8b6f56;
+  cursor: pointer;
+  border: none;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+.identity-badge.partner { background: #fce4d6; color: #c5703c; }
+
+/* Tab bar */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  display: flex;
+  justify-content: space-around;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid #e8dfd5;
+  padding: 4px 0 env(safe-area-inset-bottom, 4px);
+  z-index: 10;
+}
+.tab-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 4px 10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #c4b5a5;
+  font-size: 10px;
+  font-weight: 500;
+  transition: color 0.2s;
+  min-width: 52px;
+}
+.tab-btn.on { color: #d4855e; }
+.tab-btn .ico { font-size: 22px; line-height: 1; }
+
+/* Pages */
+.page { display: none; padding: 0 20px 24px; animation: fadeIn 0.2s ease; }
+.page.show { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 56px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #5b3a29;
+  color: #fff;
+  padding: 7px 18px;
+  border-radius: 20px;
+  font-size: 12px;
+  z-index: 300;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  font-weight: 500;
+}
+.toast.show { opacity: 1; }
+
+/* === SETUP OVERLAY === */
+.setup-mask {
+  position: fixed;
+  inset: 0;
+  background: #faf8f5;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+}
+.setup-mask.hidden { display: none; }
+.setup-box {
+  background: #fff;
+  border-radius: 24px;
+  padding: 32px 24px;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.06);
+  text-align: center;
+}
+.setup-box .logo { font-size: 52px; margin-bottom: 6px; }
+.setup-box h2 { font-size: 22px; color: #5b3a29; margin-bottom: 4px; font-weight: 640; }
+.setup-box .desc { font-size: 12px; color: #8b6f56; margin-bottom: 20px; line-height: 1.6; }
+.setup-box .field { margin-bottom: 12px; text-align: left; }
+.setup-box .field label { font-size: 12px; color: #8b6f56; margin-bottom: 3px; display: block; font-weight: 500; }
+.setup-box .field input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid #e8dfd5;
+  border-radius: 10px;
+  font-size: 15px;
+  text-align: center;
+  letter-spacing: 0.5px;
+  outline: none;
+  background: #faf8f5;
+  transition: border-color 0.2s;
+}
+.setup-box .field input:focus { border-color: #d4855e; }
+.setup-box .btn {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: opacity 0.15s;
+}
+.setup-box .btn:active { opacity: 0.7; }
+.setup-box .btn.primary { background: #d4855e; color: #fff; margin-top: 6px; }
+.setup-box .btn.ghost { background: none; color: #d4855e; border: 1px solid #d4855e; margin-top: 8px; }
+.setup-divider {
+  color: #c4b5a5;
+  font-size: 11px;
+  margin: 14px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.setup-divider::before, .setup-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e8dfd5;
+}
+
+/* === COUNTDOWN === */
+.cd-card {
+  background: linear-gradient(145deg, #5b3a29 0%, #7a4f38 100%);
+  border-radius: 22px;
+  padding: 32px 24px 28px;
+  color: #fff;
+  text-align: center;
+  margin-top: 4px;
+  box-shadow: 0 12px 40px rgba(91,58,41,0.18);
+}
+.cd-card .cd-label { font-size: 12px; opacity: 0.78; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; }
+.cd-card .cd-num { font-size: 72px; font-weight: 180; line-height: 1; margin: 10px 0 6px; letter-spacing: -3px; }
+.cd-card .cd-date { font-size: 13px; opacity: 0.7; }
+.cd-set { text-align: center; margin-top: 14px; }
+.cd-set button { background: none; border: none; color: #d4855e; font-size: 13px; cursor: pointer; font-weight: 500; }
+
+.sec-title {
+  font-size: 14px;
+  font-weight: 640;
+  color: #5b3a29;
+  margin: 22px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.3px;
+}
+.plan-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #fff;
+  border-radius: 12px;
+  margin-bottom: 7px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  transition: transform 0.15s;
+}
+.plan-row:active { transform: scale(0.985); }
+.plan-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #d4c5b5; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; color: transparent; transition: all 0.2s; }
+.plan-dot.ok { background: #d4855e; border-color: #d4855e; color: #fff; }
+.plan-txt { flex:1; font-size: 14px; }
+.plan-del { color: #c4b5a5; font-size: 14px; cursor: pointer; padding: 2px 4px; }
+.add-row { display: flex; gap: 8px; margin-top: 6px; }
+.add-row input {
+  flex:1; padding: 11px 14px; border: 1px solid #e8dfd5; border-radius: 10px;
+  outline: none; background: #fff; font-size: 14px; transition: border-color 0.2s;
+}
+.add-row input:focus { border-color: #d4855e; }
+.add-row button {
+  padding: 11px 18px; background: #d4855e; color: #fff; border: none;
+  border-radius: 10px; font-size: 14px; cursor: pointer; font-weight: 500; white-space: nowrap;
+}
+.add-row button:active { opacity: 0.75; }
+
+/* === MOOD === */
+.mood-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 4px;
+}
+.mood-tile {
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px 10px;
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  -webkit-tap-highlight-color: transparent;
+}
+.mood-tile:active { transform: scale(0.94); }
+.mood-tile.sel { border-color: #d4855e; background: #fef9f5; }
+.mood-tile .emo { font-size: 34px; line-height: 1; }
+.mood-tile .lbl { font-size: 11px; color: #8b6f56; margin-top: 4px; font-weight: 500; }
+
+.partner-box {
+  margin-top: 22px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  text-align: center;
+}
+.partner-box .plbl { font-size: 13px; color: #8b6f56; font-weight: 500; margin-bottom: 8px; }
+.partner-box .pemo { font-size: 56px; line-height: 1; padding: 6px; }
+.partner-acts { display: flex; gap: 8px; margin-top: 14px; }
+.partner-acts button {
+  flex:1; padding: 10px 6px; border-radius: 10px; border: 1px solid #e8dfd5;
+  background: #fff; font-size: 12px; cursor: pointer; font-weight: 500; transition: background 0.15s;
+}
+.partner-acts button:active { background: #fef9f5; }
+
+/* === DAILY Q === */
+.dq-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 26px 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-top: 4px;
+}
+.dq-badge {
+  font-size: 10px; letter-spacing: 2px; color: #d4855e; margin-bottom: 10px;
+  text-transform: uppercase; font-weight: 600;
+}
+.dq-text { font-size: 17px; font-weight: 500; line-height: 1.55; color: #3d322b; margin-bottom: 18px; }
+.dq-ans { display: flex; gap: 8px; }
+.dq-ans input {
+  flex:1; padding: 12px 14px; border: 1px solid #e8dfd5; border-radius: 12px;
+  outline: none; background: #faf8f5; font-size: 14px;
+}
+.dq-ans input:focus { border-color: #d4855e; }
+.dq-ans button {
+  padding: 12px 20px; background: #d4855e; color: #fff; border: none;
+  border-radius: 12px; font-size: 14px; cursor: pointer; font-weight: 500;
+}
+.dq-ans button:active { opacity: 0.75; }
+.dq-reveal {
+  margin-top: 16px; padding: 16px; background: #fef9f5; border-radius: 12px;
+  display: none; text-align: left;
+}
+.dq-reveal.show { display: block; }
+.dq-reveal .line { font-size: 14px; margin-bottom: 5px; line-height: 1.5; }
+.dq-reveal .who { font-size: 11px; color: #8b6f56; font-weight: 500; }
+
+/* === FRAGMENTS === */
+.frag-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 4px;
+}
+.frag-cell {
+  aspect-ratio: 1;
+  background: #e8dfd5;
+  border-radius: 14px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  transition: transform 0.15s;
+}
+.frag-cell:active { transform: scale(0.94); }
+.frag-add {
+  aspect-ratio: 1;
+  background: #fff;
+  border: 2px dashed #e8dfd5;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #c4b5a5;
+  font-size: 11px;
+  font-weight: 500;
+  transition: border-color 0.2s;
+  gap: 2px;
+}
+.frag-add .big { font-size: 26px; font-weight: 300; }
+.frag-x {
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  border: none;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* === FUND === */
+.fund-top {
+  background: linear-gradient(145deg, #d4855e 0%, #e8a57a 100%);
+  border-radius: 22px;
+  padding: 24px;
+  color: #fff;
+  text-align: center;
+  margin-top: 4px;
+  box-shadow: 0 12px 40px rgba(212,133,94,0.22);
+}
+.fund-top .flbl { font-size: 12px; opacity: 0.85; letter-spacing: 2px; font-weight: 500; }
+.fund-top .famt { font-size: 60px; font-weight: 180; line-height: 1; margin: 6px 0 2px; }
+.fund-top .famt em { font-size: 16px; font-weight: 400; font-style: normal; }
+
+.act-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 4px; }
+.act-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  border: 2px solid transparent;
+  transition: all 0.15s;
+}
+.act-card:active { border-color: #d4855e; transform: scale(0.97); }
+.act-card .emo { font-size: 30px; }
+.act-card .lab { font-size: 13px; font-weight: 500; margin: 3px 0 1px; }
+.act-card .pts { font-size: 11px; color: #d4855e; font-weight: 500; }
+
+.hist-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #fff;
+  border-radius: 10px;
+  margin-bottom: 5px;
+  font-size: 13px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.hist-item .val { font-weight: 600; }
+.hist-item .val.plus { color: #d4855e; }
+.hist-item .val.minus { color: #7a4f38; }
+
+/* === WISHLIST === */
+.wish-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #fff;
+  border-radius: 14px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.wish-icon {
+  width: 48px; height: 48px;
+  background: #faf8f5;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+.wish-body { flex:1; min-width: 0; }
+.wish-body .wn { font-size: 14px; font-weight: 500; }
+.wish-body .wm { font-size: 11px; color: #8b6f56; margin-top: 1px; }
+.wish-tag {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.wish-tag.want { background: #f0e6da; color: #8b6f56; }
+.wish-tag.buying { background: #fef9f5; color: #d4855e; }
+.wish-tag.bought { background: #e8dfd5; color: #5b3a29; }
+.wish-act {
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #d4855e;
+  background: #fff;
+  color: #d4855e;
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.btn-add {
+  width: 100%;
+  padding: 14px;
+  border: 2px dashed #e8dfd5;
+  border-radius: 14px;
+  background: #fff;
+  font-size: 13px;
+  color: #c4b5a5;
+  cursor: pointer;
+  font-weight: 500;
+  transition: border-color 0.2s;
+}
+.btn-add:hover { border-color: #d4855e; }
+
+/* === MODAL === */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 400;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-sheet {
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 24px 20px 32px;
+  width: 100%;
+  max-width: 430px;
+  animation: slideUp 0.25s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-sheet h3 { font-size: 16px; margin-bottom: 14px; color: #5b3a29; font-weight: 640; }
+.modal-sheet input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e8dfd5;
+  border-radius: 10px;
+  font-size: 15px;
+  margin-bottom: 10px;
+  outline: none;
+  background: #faf8f5;
+  transition: border-color 0.2s;
+}
+.modal-sheet input:focus { border-color: #d4855e; }
+.modal-btns { display: flex; gap: 8px; }
+.modal-btns button {
+  flex:1; padding: 13px; border-radius: 12px; font-size: 14px;
+  cursor: pointer; border: none; font-weight: 500;
+}
+.modal-btns .ok { background: #d4855e; color: #fff; }
+.modal-btns .cancel { background: #f0e6da; color: #8b6f56; }
+</style>
+</head>
+<body>
+
+<!-- === SETUP (first-run) === -->
+<div class="setup-mask" id="setupScreen">
+  <div class="setup-box">
+    <div class="logo">💑</div>
+    <h2>我们之间</h2>
+    <p class="desc" id="setupDesc">两个人的小空间</p>
+
+    <div id="setupSectionA">
+      <div class="field">
+        <label>你们的配对码</label>
+        <input type="text" id="setupPairCode" placeholder="比如：xiaoming-xiaohong" maxlength="30" autocomplete="off">
+      </div>
+      <button class="btn primary" onclick="setupContinue()">进入</button>
+      <div class="setup-divider">可选：设置云同步</div>
+      <button class="btn ghost" onclick="showSetupSupabase()">配置 Supabase 同步数据</button>
+    </div>
+
+    <div id="setupSectionB" style="display:none;">
+      <div class="field">
+        <label>Supabase URL</label>
+        <input type="text" id="setupSUrl" placeholder="https://xxxxx.supabase.co" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Supabase Anon Key</label>
+        <input type="text" id="setupSKey" placeholder="anon key" autocomplete="off">
+      </div>
+      <button class="btn primary" onclick="finishSetup()">完成设置</button>
+      <button class="btn ghost" onclick="hideSetupSupabase()">跳过，使用离线模式</button>
+    </div>
+  </div>
+</div>
+
+<!-- === HEADER === -->
+<div class="header">
+  <h1>我们之间</h1>
+  <div class="header-right">
+    <span class="sync-pill off" id="syncPill">离线</span>
+    <button class="identity-badge" id="idBadge" onclick="switchId()">我是我</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ===== PAGES ===== -->
+
+<!-- COUNTDOWN -->
+<div class="page show" id="pg-countdown">
+  <div class="cd-card">
+    <div class="cd-label">距离下次见面</div>
+    <div class="cd-num" id="cdNum">--</div>
+    <div class="cd-date" id="cdDate">请先设置见面日期</div>
+  </div>
+  <div class="cd-set"><button onclick="pickDate()">设置下次见面日期</button></div>
+  <div class="sec-title">想一起做的事</div>
+  <div id="planList"></div>
+  <div class="add-row">
+    <input type="text" id="planInput" placeholder="写下想一起做的事..." onkeydown="if(event.key==='Enter')addPlan()">
+    <button onclick="addPlan()">添加</button>
+  </div>
+</div>
+
+<!-- MOOD -->
+<div class="page" id="pg-mood">
+  <p style="font-size:12px;color:#8b6f56;margin:4px 0 14px;">今天的心情</p>
+  <div class="mood-grid" id="moodGrid"></div>
+  <div class="partner-box">
+    <div class="plbl" id="pmLabel">TA 今天的心情</div>
+    <div class="pemo" id="pmEmoji">🌙</div>
+    <div class="partner-acts">
+      <button onclick="toastMsg('去微信跟 TA 说句话吧~')">发个消息</button>
+      <button onclick="toastMsg('有时候，听到声音就是最好的安慰')">打个电话</button>
+    </div>
+  </div>
+</div>
+
+<!-- DAILY Q -->
+<div class="page" id="pg-dailyq">
+  <div class="dq-card">
+    <div class="dq-badge">每日一问</div>
+    <div class="dq-text" id="dqQ"></div>
+    <div class="dq-ans" id="dqInputArea">
+      <input type="text" id="dqInput" placeholder="写下你的回答...">
+      <button onclick="submitAnswer()">回答</button>
+    </div>
+    <div class="dq-reveal" id="dqReveal">
+      <div class="line"><span class="who">我的回答：</span><span id="dqMy"></span></div>
+      <div class="line"><span class="who">TA 的回答：</span><span id="dqPartner"></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- FRAGMENTS -->
+<div class="page" id="pg-fragments">
+  <p style="font-size:12px;color:#8b6f56;margin:4px 0 10px;">随手记录，让 TA 看到你的日常</p>
+  <div class="frag-grid" id="fragGrid">
+    <div class="frag-add" onclick="addFrag()"><span class="big">+</span>碎片</div>
+  </div>
+</div>
+
+<!-- FUND -->
+<div class="page" id="pg-fund">
+  <div class="fund-top">
+    <div class="flbl">见面基金</div>
+    <div class="famt" id="fundAmt">0<em> 枚</em></div>
+  </div>
+  <div class="sec-title">赚取</div>
+  <div class="act-grid" id="earnGrid"></div>
+  <div class="sec-title">兑换</div>
+  <div class="act-grid" id="redeemGrid"></div>
+  <div class="sec-title">记录</div>
+  <div id="fundHist"></div>
+</div>
+
+<!-- WISHLIST -->
+<div class="page" id="pg-wishlist">
+  <p style="font-size:12px;color:#8b6f56;margin:4px 0 10px;">写下想要的小心愿，TA 会悄悄看到</p>
+  <div id="wishList"></div>
+  <button class="btn-add" onclick="showWishModal()">+ 添加心愿</button>
+</div>
+
+<!-- === TAB BAR === -->
+<div class="tab-bar">
+  <button class="tab-btn on" onclick="goPage('countdown')"><span class="ico">⏳</span>见面</button>
+  <button class="tab-btn" onclick="goPage('mood')"><span class="ico">💡</span>心情</button>
+  <button class="tab-btn" onclick="goPage('dailyq')"><span class="ico">💬</span>问答</button>
+  <button class="tab-btn" onclick="goPage('fragments')"><span class="ico">🖼️</span>碎片</button>
+  <button class="tab-btn" onclick="goPage('fund')"><span class="ico">💰</span>基金</button>
+  <button class="tab-btn" onclick="goPage('wishlist')"><span class="ico">🎁</span>心愿</button>
+</div>
+
+<script>
+// ========================= 全局状态 =========================
+const D = {
+  meetDate: null,
+  plans: [],
+  moodMe: null,
+  moodPartner: null,
+  qDate: '',
+  qAnswerMe: '',
+  qAnswerPartner: '',
+  fragments: [],
+  fundBalance: 0,
+  fundHistory: [],
+  wishlist: [],
+  identity: 'self',
+};
+
+let supabase = null;
+let currentPage = 'countdown';
+let syncTimer = null;
+const LC = 'us_data_v2';
+
+// ========================= 存储 =========================
+function localLoad() {
+  try {
+    const raw = localStorage.getItem(LC);
+    if (raw) Object.assign(D, JSON.parse(raw));
+  } catch(e) {}
+}
+function localSave() {
+  try { localStorage.setItem(LC, JSON.stringify(D)); } catch(e) {}
+}
+
+// ========================= Supabase =========================
+function getSBConfig() {
+  return {
+    url: localStorage.getItem('us_sb_url') || '',
+    key: localStorage.getItem('us_sb_key') || '',
+    code: localStorage.getItem('us_sb_code') || '',
+  };
+}
+function saveSBConfig(url, key, code) {
+  localStorage.setItem('us_sb_url', url);
+  localStorage.setItem('us_sb_key', key);
+  localStorage.setItem('us_sb_code', code);
+}
+
+function initSB() {
+  const cfg = getSBConfig();
+  if (!cfg.url || !cfg.key) return false;
+  try {
+    supabase = window.supabase.createClient(cfg.url, cfg.key);
+    return true;
+  } catch(e) { return false; }
+}
+
+async function cloudLoad() {
+  if (!supabase) return null;
+  const code = getSBConfig().code;
+  if (!code) return null;
+  try {
+    const { data: row, error } = await supabase
+      .from('couples').select('data').eq('pair_code', code).maybeSingle();
+    if (error) throw error;
+    return row?.data || null;
+  } catch(e) { return null; }
+}
+
+async function cloudSave() {
+  if (!supabase) return false;
+  const code = getSBConfig().code;
+  if (!code) return false;
+  try {
+    const { error } = await supabase.from('couples').upsert({
+      pair_code: code,
+      data: D,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'pair_code' });
+    return !error;
+  } catch(e) { return false; }
+}
+
+function updateSyncUI(status) {
+  const pill = document.getElementById('syncPill');
+  pill.className = 'sync-pill ' + status;
+  pill.textContent = status === 'on' ? '已同步' : status === 'loading' ? '同步中' : '离线';
+}
+
+// ========================= 身份 =========================
+function switchId() {
+  D.identity = D.identity === 'self' ? 'partner' : 'self';
+  persistAndSync();
+  const b = document.getElementById('idBadge');
+  if (D.identity === 'self') { b.textContent = '我是我'; b.className = 'identity-badge'; }
+  else { b.textContent = '我是 TA'; b.className = 'identity-badge partner'; }
+  renderCurrent();
+}
+
+// ========================= 持久化 =========================
+async function persistAndSync() {
+  localSave();
+  if (supabase) {
+    updateSyncUI('loading');
+    const ok = await cloudSave();
+    updateSyncUI(ok ? 'on' : 'off');
+  }
+}
+
+async function pullFromCloud() {
+  if (!supabase) return;
+  const cloud = await cloudLoad();
+  if (!cloud) return;
+  const id = D.identity;
+  Object.assign(D, cloud);
+  D.identity = id;
+  localSave();
+  updateSyncUI('on');
+}
+
+// ========================= 页面导航 =========================
+function goPage(name) {
+  currentPage = name;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+  document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('on'));
+  const pg = document.getElementById('pg-' + name);
+  if (pg) pg.classList.add('show');
+  const map = { countdown:0, mood:1, dailyq:2, fragments:3, fund:4, wishlist:5 };
+  document.querySelectorAll('.tab-btn')[map[name]]?.classList.add('on');
+  renderPage(name);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderCurrent() { renderPage(currentPage); }
+function renderAll() {
+  ['countdown','mood','dailyq','fragments','fund','wishlist'].forEach(renderPage);
+}
+
+function renderPage(name) {
+  switch(name) {
+    case 'countdown': rCountdown(); break;
+    case 'mood': rMood(); break;
+    case 'dailyq': rDailyQ(); break;
+    case 'fragments': rFragments(); break;
+    case 'fund': rFund(); break;
+    case 'wishlist': rWishlist(); break;
+  }
+}
+
+// ========================= COUNTDOWN =========================
+function rCountdown() {
+  const num = document.getElementById('cdNum');
+  const date = document.getElementById('cdDate');
+  if (D.meetDate) {
+    const t = new Date(D.meetDate);
+    const diff = Math.ceil((t - new Date()) / 86400000);
+    num.textContent = diff > 0 ? diff : (diff === 0 ? '今天!' : '已过去');
+    if (diff > 0) date.textContent = t.toLocaleDateString('zh-CN', { month:'long', day:'numeric', weekday:'long' });
+    else if (diff === 0) date.textContent = '就是今天!';
+    else date.textContent = '期待下一次';
+  } else { num.textContent = '--'; date.textContent = '请先设置见面日期'; }
+  rPlans();
+}
+function pickDate() {
+  const s = prompt('输入见面日期 (YYYY-MM-DD)：', D.meetDate || '');
+  if (s && /^\d{4}-\d{2}-\d{2}$/.test(s)) { D.meetDate = s; persistAndSync(); rCountdown(); }
+  else if (s) alert('格式不对，请输入 YYYY-MM-DD');
+}
+function rPlans() {
+  document.getElementById('planList').innerHTML = D.plans.map((p, i) => `
+    <div class="plan-row">
+      <div class="plan-dot ${p.done ? 'ok' : ''}" onclick="togPlan(${i})">${p.done ? '✓' : ''}</div>
+      <span class="plan-txt" style="${p.done ? 'text-decoration:line-through;color:#c4b5a5' : ''}">${esc(p.text)}</span>
+      <span class="plan-del" onclick="delPlan(${i})">✕</span>
+    </div>`).join('');
+}
+function addPlan() {
+  const v = document.getElementById('planInput').value.trim();
+  if (!v) return;
+  D.plans.push({ text: v, done: false });
+  document.getElementById('planInput').value = '';
+  persistAndSync(); rPlans();
+}
+function togPlan(i) { D.plans[i].done = !D.plans[i].done; persistAndSync(); rPlans(); }
+function delPlan(i) { D.plans.splice(i, 1); persistAndSync(); rPlans(); }
+
+// ========================= MOOD =========================
+const MOODS = [
+  { e:'😊', l:'开心' }, { e:'🥰', l:'想念' }, { e:'😴', l:'疲惫' }, { e:'😤', l:'烦躁' },
+  { e:'😢', l:'难过' }, { e:'🎉', l:'兴奋' }, { e:'😌', l:'平静' }, { e:'🤔', l:'思考中' },
+];
+function rMood() {
+  const mine = D.identity === 'self' ? D.moodMe : D.moodPartner;
+  document.getElementById('moodGrid').innerHTML = MOODS.map((m, i) => `
+    <div class="mood-tile ${mine === i ? 'sel' : ''}" onclick="setMood(${i})">
+      <div class="emo">${m.e}</div><div class="lbl">${m.l}</div>
+    </div>`).join('');
+  const pm = D.identity === 'self' ? D.moodPartner : D.moodMe;
+  document.getElementById('pmLabel').textContent = D.identity === 'self' ? 'TA 今天的心情' : '我今天的心情';
+  document.getElementById('pmEmoji').textContent = pm != null ? MOODS[pm].e : '🌙';
+}
+function setMood(i) {
+  if (D.identity === 'self') D.moodMe = (D.moodMe === i ? null : i);
+  else D.moodPartner = (D.moodPartner === i ? null : i);
+  persistAndSync(); rMood();
+}
+
+// ========================= DAILY Q =========================
+const QS = [
+  '今天让你最想TA的瞬间是什么？','下次见面住民宿还是酒店？','如果立刻出现在TA面前，你想做什么？',
+  'TA做过最让你感动的一件事？','最近压力大吗？想对TA说什么？','你觉得在一起最舒服的状态是？',
+  '说一件今天的小事给TA听。','下次见面最想一起吃什么？','异地最难和最甜的分别是什么？',
+  '用三个词形容今天的情绪。',
+];
+function rDailyQ() {
+  const today = new Date().toISOString().slice(0,10);
+  if (D.qDate !== today) { D.qDate = today; D.qAnswerMe = ''; D.qAnswerPartner = ''; persistAndSync(); }
+  document.getElementById('dqQ').textContent = QS[parseInt(today.replace(/-/g,'')) % QS.length];
+  const my = D.identity === 'self' ? D.qAnswerMe : D.qAnswerPartner;
+  const pt = D.identity === 'self' ? D.qAnswerPartner : D.qAnswerMe;
+  if (my) {
+    document.getElementById('dqInputArea').style.display = 'none';
+    document.getElementById('dqReveal').classList.add('show');
+    document.getElementById('dqMy').textContent = my;
+    document.getElementById('dqPartner').textContent = pt || '等待中...';
+  } else {
+    document.getElementById('dqInputArea').style.display = 'flex';
+    document.getElementById('dqReveal').classList.remove('show');
+    document.getElementById('dqInput').value = '';
+  }
+}
+function submitAnswer() {
+  const v = document.getElementById('dqInput').value.trim();
+  if (!v) return;
+  if (D.identity === 'self') D.qAnswerMe = v;
+  else D.qAnswerPartner = v;
+  persistAndSync(); rDailyQ();
+}
+
+// ========================= FRAGMENTS =========================
+function rFragments() {
+  let h = D.fragments.map((f, i) => `
+    <div class="frag-cell" onclick="viewFrag(${i})">
+      <span>${f.emoji || '📝'}</span>
+      <button class="frag-x" onclick="event.stopPropagation();delFrag(${i})">✕</button>
+    </div>`).join('');
+  h += '<div class="frag-add" onclick="addFrag()"><span class="big">+</span>碎片</div>';
+  document.getElementById('fragGrid').innerHTML = h;
+}
+function addFrag() {
+  const v = prompt('记录一个瞬间：');
+  if (!v || !v.trim()) return;
+  const t = v.trim();
+  D.fragments.push({ text: t, emoji: t.length <= 4 ? t : '📝', date: new Date().toISOString() });
+  persistAndSync(); rFragments();
+}
+function viewFrag(i) {
+  alert('💌 ' + D.fragments[i].text + '\n\n' + new Date(D.fragments[i].date).toLocaleDateString('zh-CN'));
+}
+function delFrag(i) { if (confirm('删除？')) { D.fragments.splice(i, 1); persistAndSync(); rFragments(); } }
+
+// ========================= FUND =========================
+const EARNS = [
+  { e:'💪', l:'忍住没吵架', p:2 }, { e:'📹', l:'主动视频', p:3 },
+  { e:'💌', l:'写了真心话', p:3 }, { e:'☀️', l:'主动说早安', p:1 },
+];
+const REDEEMS = [
+  { e:'🧋', l:'请喝奶茶', c:5 }, { e:'💆', l:'按摩十分钟', c:8 },
+  { e:'🎬', l:'选下次电影', c:3 }, { e:'🍳', l:'做一道菜', c:10 },
+];
+function rFund() {
+  document.getElementById('fundAmt').innerHTML = `${D.fundBalance}<em> 枚</em>`;
+  document.getElementById('earnGrid').innerHTML = EARNS.map((f,i) => `
+    <div class="act-card" onclick="doEarn(${i})"><div class="emo">${f.e}</div><div class="lab">${f.l}</div><div class="pts">+${f.p} 枚</div></div>`).join('');
+  document.getElementById('redeemGrid').innerHTML = REDEEMS.map((f,i) => `
+    <div class="act-card" onclick="doRedeem(${i})"><div class="emo">${f.e}</div><div class="lab">${f.l}</div><div class="pts">-${f.c} 枚</div></div>`).join('');
+  const hist = document.getElementById('fundHist');
+  if (!D.fundHistory.length) {
+    hist.innerHTML = '<p style="color:#c4b5a5;font-size:12px;text-align:center;padding:14px;">还没有记录</p>';
+  } else {
+    hist.innerHTML = D.fundHistory.slice().reverse().slice(0, 10).map(h => `
+      <div class="hist-item"><span>${h.label}</span><span class="val ${h.amount > 0 ? 'plus' : 'minus'}">${h.amount>0?'+':''}${h.amount} 枚</span></div>`).join('');
+  }
+}
+function doEarn(i) {
+  const f = EARNS[i]; D.fundBalance += f.p;
+  D.fundHistory.push({ label: f.l, amount: f.p, time: Date.now() });
+  persistAndSync(); rFund();
+}
+function doRedeem(i) {
+  const f = REDEEMS[i];
+  if (D.fundBalance < f.c) { alert('基金不够哦~'); return; }
+  D.fundBalance -= f.c;
+  D.fundHistory.push({ label: f.l, amount: -f.c, time: Date.now() });
+  persistAndSync(); rFund();
+  toastMsg('兑换成功！见面时兑现吧~');
+}
+
+// ========================= WISHLIST =========================
+function rWishlist() {
+  const c = document.getElementById('wishList');
+  if (!D.wishlist.length) {
+    c.innerHTML = '<p style="color:#c4b5a5;font-size:12px;text-align:center;padding:18px;">还没有心愿</p>';
+    return;
+  }
+  c.innerHTML = D.wishlist.map((w, i) => {
+    const tags = { want: '想要', buying: '准备中', bought: '已实现' };
+    return `<div class="wish-row">
+      <div class="wish-icon">${w.emoji || '🎁'}</div>
+      <div class="wish-body"><div class="wn">${esc(w.name)}</div>
+        <div class="wm">${w.price ? '¥'+w.price : ''}${w.price&&w.link?' · ':''}${w.link ? '🔗 有链接' : ''}</div>
+      </div>
+      <span class="wish-tag ${w.status}">${tags[w.status]}</span>
+      ${D.identity === 'partner' && w.status === 'want' ? `<button class="wish-act" onclick="markBuy(${i})">准备买</button>` : ''}
+      ${D.identity === 'self' && w.status === 'buying' ? `<button class="wish-act" style="border-color:#5b3a29;color:#5b3a29;" onclick="markBought(${i})">已实现</button>` : ''}
+      <span style="cursor:pointer;color:#c4b5a5;font-size:14px;margin-left:2px;" onclick="delWish(${i})">✕</span>
+    </div>`;
+  }).join('');
+}
+function showWishModal() {
+  const m = document.createElement('div'); m.className = 'modal-mask';
+  m.innerHTML = `<div class="modal-sheet">
+    <h3>添加心愿</h3>
+    <input type="text" id="wmName" placeholder="想要什么？">
+    <input type="text" id="wmEmoji" placeholder="emoji（可选）" maxlength="2">
+    <input type="text" id="wmPrice" placeholder="大概价格（可选）">
+    <input type="text" id="wmLink" placeholder="链接（可选）">
+    <div class="modal-btns"><button class="cancel" onclick="this.closest('.modal-mask').remove()">取消</button><button class="ok" onclick="doAddWish()">添加</button></div>
+  </div>`;
+  document.body.appendChild(m);
+  m.onclick = e => { if (e.target === m) m.remove(); };
+}
+function doAddWish() {
+  const nm = document.getElementById('wmName').value.trim(); if (!nm) return alert('请填写心愿');
+  D.wishlist.push({ name: nm, emoji: document.getElementById('wmEmoji').value.trim() || '🎁', price: document.getElementById('wmPrice').value.trim(), link: document.getElementById('wmLink').value.trim(), status: 'want' });
+  document.querySelector('.modal-mask')?.remove();
+  persistAndSync(); rWishlist();
+}
+function markBuy(i) { D.wishlist[i].status = 'buying'; persistAndSync(); rWishlist(); }
+function markBought(i) { D.wishlist[i].status = 'bought'; persistAndSync(); rWishlist(); }
+function delWish(i) { if (confirm('删除？')) { D.wishlist.splice(i, 1); persistAndSync(); rWishlist(); } }
+
+// ========================= SETUP =========================
+function showSetupSupabase() {
+  document.getElementById('setupSectionA').style.display = 'none';
+  document.getElementById('setupSectionB').style.display = 'block';
+  document.getElementById('setupDesc').textContent = '配置云同步（可选）';
+}
+
+function hideSetupSupabase() {
+  document.getElementById('setupSectionB').style.display = 'none';
+  document.getElementById('setupSectionA').style.display = 'block';
+  document.getElementById('setupDesc').textContent = '两个人的小空间';
+  const code = document.getElementById('setupPairCode').value.trim();
+  if (!code) { alert('请先输入配对码'); return; }
+  finishSetupNoSB(code);
+}
+
+function setupContinue() {
+  const code = document.getElementById('setupPairCode').value.trim();
+  if (!code) { alert('请输入你们的配对码'); return; }
+  // Check if Supabase is configured in localStorage from before
+  const cfg = getSBConfig();
+  if (cfg.url && cfg.key) {
+    finishSetupWithSB(code, cfg.url, cfg.key);
+  } else {
+    finishSetupNoSB(code);
+  }
+}
+
+function finishSetup() {
+  const url = document.getElementById('setupSUrl').value.trim();
+  const key = document.getElementById('setupSKey').value.trim();
+  const code = document.getElementById('setupPairCode').value.trim();
+  if (!code) { alert('请先在第一步输入配对码'); return; }
+  if (!url || !key) { alert('请填写 Supabase 连接信息，或点击"跳过"使用离线模式'); return; }
+  finishSetupWithSB(code, url, key);
+}
+
+function finishSetupWithSB(code, url, key) {
+  saveSBConfig(url, key, code);
+  if (!initSB()) { toastMsg('Supabase 连接失败'); return; }
+  document.getElementById('setupScreen').classList.add('hidden');
+  updateSyncUI('on');
+  startAutoSync();
+  cloudLoad().then(c => {
+    if (c) { const id = D.identity; Object.assign(D, c); D.identity = id; localSave(); }
+    else { cloudSave(); }
+    updateSyncUI('on');
+    renderAll();
+  });
+  toastMsg('云同步已开启');
+}
+
+function finishSetupNoSB(code) {
+  saveSBConfig('', '', code);
+  document.getElementById('setupScreen').classList.add('hidden');
+  updateSyncUI('off');
+  renderAll();
+  toastMsg('离线模式，数据仅保存在本地');
+}
+
+// ========================= SYNC LOOP =========================
+function startAutoSync() {
+  if (syncTimer) clearInterval(syncTimer);
+  syncTimer = setInterval(async () => {
+    if (!supabase) return;
+    const cloud = await cloudLoad();
+    if (cloud) {
+      const id = D.identity;
+      const changed = JSON.stringify(cloud) !== JSON.stringify(D);
+      if (changed) { Object.assign(D, cloud); D.identity = id; localSave(); renderCurrent(); updateSyncUI('on'); }
+    }
+  }, 30000);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && supabase) { pullFromCloud().then(() => renderCurrent()); }
+  });
+}
+
+// ========================= UTILS =========================
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function toastMsg(m) {
+  const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ========================= INIT =========================
+async function init() {
+  localLoad();
+
+  // Check if already configured
+  const cfg = getSBConfig();
+  const hasPair = !!cfg.code;
+  const hasSB = initSB();
+
+  if (hasPair) {
+    document.getElementById('setupScreen').classList.add('hidden');
+    if (hasSB) {
+      updateSyncUI('loading');
+      await pullFromCloud();
+      updateSyncUI('on');
+      startAutoSync();
+    } else {
+      updateSyncUI('off');
+    }
+  } else {
+    document.getElementById('setupScreen').classList.remove('hidden');
+    updateSyncUI('off');
+  }
+
+  // Render
+  renderAll();
+  document.getElementById('pg-countdown').classList.add('show');
+
+  // Header double-tap to reopen config
+  document.querySelector('.header h1').style.cursor = 'pointer';
+  document.querySelector('.header h1').onclick = function(e) {
+    // triple click to reopen setup
+    if (e.detail === 3) {
+      document.getElementById('setupScreen').classList.remove('hidden');
+      document.getElementById('setupSectionA').style.display = 'block';
+      document.getElementById('setupSectionB').style.display = 'none';
+    }
+  };
+}
+
+init();
+</script>
+</body>
+</html>
