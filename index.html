@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -8,15 +8,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="我们之间">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💑</text></svg>">
-<script>
-// 异步加载 Supabase SDK，避免 CDN 卡住导致页面白屏
-(function(){
-  var s = document.createElement('script');
-  s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-  s.onerror = function(){ console.warn('Supabase SDK 加载失败，使用离线模式'); };
-  document.head.appendChild(s);
-})();
-</script>
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 body {
@@ -714,6 +705,9 @@ function localSave() {
 }
 
 // ========================= Supabase =========================
+let SB_URL = '';
+let SB_KEY = '';
+
 function getSBConfig() {
   return {
     url: localStorage.getItem('us_sb_url') || '',
@@ -727,47 +721,60 @@ function saveSBConfig(url, key, code) {
   localStorage.setItem('us_sb_code', code);
 }
 
+function sbReady() {
+  const cfg = getSBConfig();
+  return !!(cfg.url && cfg.key && cfg.code);
+}
+
 function initSB() {
   const cfg = getSBConfig();
   if (!cfg.url || !cfg.key) return false;
-  if (!window.supabase || !window.supabase.createClient) return false;
-  try {
-    supabase = window.supabase.createClient(cfg.url, cfg.key);
-    return true;
-  } catch(e) { return false; }
+  SB_URL = cfg.url; SB_KEY = cfg.key;
+  supabase = true;
+  return true;
 }
 
 async function cloudLoad() {
-  if (!supabase) return null;
-  const code = getSBConfig().code;
-  if (!code) return null;
+  if (!sbReady()) return null;
+  const cfg = getSBConfig();
   try {
-    const { data: row, error } = await supabase
-      .from('couples').select('data').eq('pair_code', code).maybeSingle();
-    if (error) throw error;
-    if (!row || !row.data) return null;
-    // 如果云端数据是个空壳子（所有字段都是默认值），视为无数据
-    const d = row.data;
-    const hasContent = d.meetDate || (d.plans && d.plans.length > 0) ||
-      d.moodMe != null || d.moodPartner != null ||
-      (d.fragments && d.fragments.length > 0) || d.fundBalance > 0 ||
-      (d.wishlist && d.wishlist.length > 0) ||
-      d.qAnswerMe || d.qAnswerPartner;
-    return hasContent ? d : null;
+    const resp = await fetch(cfg.url + '/rest/v1/couples?select=data&pair_code=eq.' + encodeURIComponent(cfg.code) + '&limit=1', {
+      headers: { 'apikey': cfg.key, 'Authorization': 'Bearer ' + cfg.key }
+    });
+    if (!resp.ok) return null;
+    const rows = await resp.json();
+    if (!rows || rows.length === 0) return null;
+    const d = rows[0].data;
+    if (!d) return null;
+    if (d.meetDate || (d.plans && d.plans.length > 0) ||
+        d.moodMe != null || d.moodPartner != null ||
+        (d.fragments && d.fragments.length > 0) || d.fundBalance > 0 ||
+        (d.wishlist && d.wishlist.length > 0) || d.qAnswerMe || d.qAnswerPartner) {
+      return d;
+    }
+    return null;
   } catch(e) { return null; }
 }
 
 async function cloudSave() {
-  if (!supabase) return false;
-  const code = getSBConfig().code;
-  if (!code) return false;
+  if (!sbReady()) return false;
+  const cfg = getSBConfig();
   try {
-    const { error } = await supabase.from('couples').upsert({
-      pair_code: code,
-      data: D,
-      updated_at: new Date().toISOString()
-    }, { onConflict: 'pair_code' });
-    return !error;
+    const resp = await fetch(cfg.url + '/rest/v1/couples', {
+      method: 'POST',
+      headers: {
+        'apikey': cfg.key,
+        'Authorization': 'Bearer ' + cfg.key,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({
+        pair_code: cfg.code,
+        data: D,
+        updated_at: new Date().toISOString()
+      })
+    });
+    return resp.ok;
   } catch(e) { return false; }
 }
 
