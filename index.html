@@ -568,12 +568,30 @@ input, textarea { font-size: 16px; }
 <div class="header">
   <h1>我们之间</h1>
   <div class="header-right">
-    <span class="sync-pill off" id="syncPill">离线</span>
+    <span class="sync-pill off" id="syncPill" onclick="openSettings()" style="cursor:pointer;" title="点击设置同步">离线</span>
     <button class="identity-badge" id="idBadge" onclick="switchId()">我是我</button>
+    <button style="background:none;border:none;cursor:pointer;font-size:18px;padding:2px 4px;" onclick="openSettings()" title="设置">⚙</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- Settings Modal -->
+<div class="modal-mask" id="settingsModal" style="display:none;">
+  <div class="modal-sheet">
+    <h3>同步设置</h3>
+    <label style="font-size:12px;color:#8b6f56;display:block;margin-bottom:2px;">配对码</label>
+    <input type="text" id="setPairCode" placeholder="你们的配对码" maxlength="30">
+    <label style="font-size:12px;color:#8b6f56;display:block;margin-bottom:2px;margin-top:4px;">Supabase URL</label>
+    <input type="text" id="setUrl" placeholder="https://xxxxx.supabase.co">
+    <label style="font-size:12px;color:#8b6f56;display:block;margin-bottom:2px;margin-top:4px;">Supabase Anon Key</label>
+    <input type="text" id="setKey" placeholder="anon key">
+    <div class="modal-btns" style="margin-top:6px;">
+      <button class="cancel" onclick="closeSettings()">取消</button>
+      <button class="ok" onclick="saveSettings()">保存并同步</button>
+    </div>
+  </div>
+</div>
 
 <!-- ===== PAGES ===== -->
 
@@ -1100,6 +1118,30 @@ function finishSetupNoSB(code) {
   updateSyncUI('off');
   renderAll();
   toastMsg('离线模式，数据仅保存在本地');
+}
+
+// ========================= SETTINGS MODAL =========================
+function openSettings() {
+  const cfg = getSBConfig();
+  document.getElementById('setPairCode').value = cfg.code || '';
+  document.getElementById('setUrl').value = cfg.url || '';
+  document.getElementById('setKey').value = cfg.key || '';
+  document.getElementById('settingsModal').style.display = 'flex';
+}
+function closeSettings() {
+  document.getElementById('settingsModal').style.display = 'none';
+}
+function saveSettings() {
+  const code = document.getElementById('setPairCode').value.trim();
+  const url = document.getElementById('setUrl').value.trim();
+  const key = document.getElementById('setKey').value.trim();
+  if (!code) { alert('请填写配对码'); return; }
+  closeSettings();
+  if (url && key) {
+    finishSetupWithSB(code, url, key);
+  } else {
+    finishSetupNoSB(code);
+  }
 }
 
 // ========================= SYNC LOOP =========================
