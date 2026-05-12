@@ -8,289 +8,362 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💑</text></svg>">
 <style>
-*,*::before,*::after{ margin:0; padding:0; box-sizing:border-box; }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
 body{
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-  background:#faf8f5; color:#3d322b; max-width:430px; margin:0 auto;
-  min-height:100vh; min-height:100dvh; overflow-x:hidden; padding-bottom:80px;
-  -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  color:#3d322b;
+  max-width:430px;
+  margin:0 auto;
+  min-height:100vh;
+  min-height:100dvh;
+  overflow-x:hidden;
+  padding-bottom:80px;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-font-smoothing:antialiased;
+  background:linear-gradient(180deg, #fef9f5 0%, #faf5f0 30%, #fdf6f2 60%, #fef9f5 100%);
+  position:relative;
 }
-input,textarea,button{ font-family:inherit; }
-input,textarea{ font-size:16px; }
+/* 背景装饰 */
+body::before{
+  content:''; position:fixed; top:-120px; right:-80px; width:260px; height:260px;
+  background:radial-gradient(circle, rgba(244,180,160,0.18) 0%, transparent 70%);
+  border-radius:50%; pointer-events:none; z-index:0;
+}
+body::after{
+  content:''; position:fixed; bottom:60px; left:-100px; width:220px; height:220px;
+  background:radial-gradient(circle, rgba(212,133,94,0.10) 0%, transparent 70%);
+  border-radius:50%; pointer-events:none; z-index:0;
+}
+.bg-hearts{
+  position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:430px;
+  height:100%; pointer-events:none; z-index:0; overflow:hidden;
+}
+.bg-hearts span{
+  position:absolute; font-size:14px; opacity:0.06; animation:floatHeart 18s infinite;
+}
+.bg-hearts span:nth-child(1){ top:8%; left:10%; animation-delay:0s; font-size:18px; }
+.bg-hearts span:nth-child(2){ top:20%; right:12%; animation-delay:3s; font-size:12px; }
+.bg-hearts span:nth-child(3){ top:45%; left:6%; animation-delay:6s; font-size:16px; }
+.bg-hearts span:nth-child(4){ top:60%; right:8%; animation-delay:9s; font-size:14px; }
+.bg-hearts span:nth-child(5){ top:75%; left:15%; animation-delay:12s; font-size:20px; }
+.bg-hearts span:nth-child(6){ top:88%; right:15%; animation-delay:15s; font-size:12px; }
+@keyframes floatHeart{
+  0%,100%{ transform:translateY(0) rotate(0deg); }
+  33%{ transform:translateY(-18px) rotate(3deg); }
+  66%{ transform:translateY(-8px) rotate(-2deg); }
+}
+
+input,textarea,button{font-family:inherit}
+input,textarea{font-size:16px}
 
 /* header */
 .header{
   padding:14px 20px 10px; display:flex; justify-content:space-between; align-items:center;
-  position:sticky; top:0; background:rgba(250,248,245,0.94); backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px); z-index:10;
+  position:sticky; top:0; z-index:10;
+  background:rgba(254,249,245,0.92); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(232,210,195,0.3);
 }
-.header h1{ font-size:19px; font-weight:640; letter-spacing:.5px; color:#5b3a29; }
-.header-right{ display:flex; align-items:center; gap:8px; }
-.sync-dot{
-  width:8px; height:8px; border-radius:50%; flex-shrink:0;
-}
-.sync-dot.on{ background:#4caf50; }
-.sync-dot.off{ background:#c4b5a5; }
-.sync-dot.loading{ background:#f0c040; animation:blink .8s infinite; }
-@keyframes blink{ 50%{ opacity:.3; } }
+.header h1{font-size:19px;font-weight:640;color:#5b3a29;letter-spacing:.5px}
+.header-right{display:flex;align-items:center;gap:8px;position:relative;z-index:2}
+.sync-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sync-dot.on{background:#6ebf6e}
+.sync-dot.off{background:#ccbbaa}
+.sync-dot.loading{background:#e8b84a;animation:blink .8s infinite}
+@keyframes blink{50%{opacity:.3}}
 .my-name-tag{
-  font-size:11px; padding:3px 10px; border-radius:10px; background:#fef9f5; color:#d4855e;
-  font-weight:500; letter-spacing:.5px; border:1px solid #f0d5c0;
+  font-size:10px;padding:3px 10px;border-radius:10px;
+  background:linear-gradient(135deg,#fef5f0,#fde8db); color:#c5703c;
+  font-weight:500;border:1px solid #f5d5c0;
 }
-.btn-gear{
-  background:none; border:none; cursor:pointer; font-size:18px; padding:2px 4px; line-height:1;
-}
+.btn-gear{background:none;border:none;cursor:pointer;font-size:17px;padding:2px 4px;line-height:1}
 
 /* tabs */
 .tab-bar{
-  position:fixed; bottom:0; left:50%; transform:translateX(-50%);
-  width:100%; max-width:430px; display:flex; justify-content:space-around;
-  background:rgba(255,255,255,0.96); backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  border-top:1px solid #e8dfd5; padding:4px 0 env(safe-area-inset-bottom,4px); z-index:10;
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;
+  display:flex;justify-content:space-around;z-index:10;
+  background:rgba(255,252,249,0.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-top:1px solid rgba(232,210,195,0.35);padding:4px 0 env(safe-area-inset-bottom,4px);
 }
 .tab-btn{
-  display:flex; flex-direction:column; align-items:center; gap:1px; padding:4px 8px;
-  border:none; background:none; cursor:pointer; color:#c4b5a5; font-size:10px;
-  font-weight:500; transition:color .2s; min-width:50px;
+  display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 8px;
+  border:none;background:none;cursor:pointer;color:#ccbbaa;font-size:10px;
+  font-weight:500;transition:color .2s;min-width:50px;
 }
-.tab-btn.on{ color:#d4855e; }
-.tab-btn .ico{ font-size:22px; line-height:1; }
+.tab-btn.on{color:#d4855e}
+.tab-btn .ico{font-size:21px;line-height:1}
 
 /* pages */
-.page{ display:none; padding:0 20px 24px; animation:fadeIn .2s ease; }
-.page.show{ display:block; }
-@keyframes fadeIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
-.sec-title{ font-size:14px; font-weight:640; color:#5b3a29; margin:22px 0 10px; letter-spacing:.3px; }
+.page{display:none;padding:0 20px 24px;animation:fadeIn .25s ease;position:relative;z-index:1}
+.page.show{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.sec-title{
+  font-size:14px;font-weight:640;color:#5b3a29;margin:22px 0 10px;
+  display:flex;align-items:center;gap:4px;
+}
+.sec-title::after{content:'';flex:1;height:1px;background:rgba(212,133,94,0.15);border-radius:1px}
 
 /* toast */
 .toast{
-  position:fixed; top:56px; left:50%; transform:translateX(-50%); background:#5b3a29;
-  color:#fff; padding:7px 18px; border-radius:20px; font-size:12px; z-index:400;
-  opacity:0; pointer-events:none; transition:opacity .3s; font-weight:500;
+  position:fixed;top:56px;left:50%;transform:translateX(-50%);
+  background:#5b3a29;color:#fff;padding:7px 18px;border-radius:20px;
+  font-size:12px;z-index:500;opacity:0;pointer-events:none;transition:opacity .3s;font-weight:500;
 }
-.toast.show{ opacity:1; }
+.toast.show{opacity:1}
 
-/* ===== LOGIN OVERLAY ===== */
+/* login */
 .login-mask{
-  position:fixed; inset:0; background:#faf8f5; z-index:500;
-  display:flex; flex-direction:column; align-items:center; justify-content:center; padding:28px;
+  position:fixed;inset:0;z-index:600;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:28px;
+  background:linear-gradient(180deg,#fef9f5,#fdf2ea,#fef9f5);
 }
 .login-box{
-  background:#fff; border-radius:24px; padding:32px 24px; width:100%; max-width:340px;
-  box-shadow:0 4px 32px rgba(0,0,0,0.06); text-align:center;
+  background:#fff;border-radius:26px;padding:36px 24px;width:100%;max-width:340px;
+  box-shadow:0 8px 48px rgba(91,58,41,0.08);text-align:center;
 }
-.login-box .logo{ font-size:52px; margin-bottom:6px; }
-.login-box h2{ font-size:22px; color:#5b3a29; margin-bottom:4px; font-weight:640; }
-.login-box .desc{ font-size:12px; color:#8b6f56; margin-bottom:20px; line-height:1.6; }
+.login-box .logo{font-size:56px;margin-bottom:8px}
+.login-box h2{font-size:22px;color:#5b3a29;margin-bottom:6px;font-weight:640}
+.login-box .desc{font-size:12px;color:#8b6f56;margin-bottom:22px;line-height:1.6}
 .login-box input{
-  width:100%; padding:12px 14px; border:1px solid #e8dfd5; border-radius:12px;
-  font-size:16px; text-align:center; outline:none; background:#faf8f5;
-  transition:border-color .2s; margin-bottom:14px;
+  width:100%;padding:13px 14px;border:1.5px solid #e8dfd5;border-radius:14px;
+  font-size:16px;text-align:center;outline:none;background:#fdf9f6;
+  transition:border-color .2s;margin-bottom:16px;
 }
-.login-box input:focus{ border-color:#d4855e; }
+.login-box input:focus{border-color:#d4855e}
 .login-box .btn{
-  width:100%; padding:13px; border:none; border-radius:12px; font-size:15px;
-  font-weight:600; cursor:pointer; letter-spacing:.5px; background:#d4855e; color:#fff;
+  width:100%;padding:14px;border:none;border-radius:14px;font-size:15px;
+  font-weight:600;cursor:pointer;background:linear-gradient(135deg,#d4855e,#cf7a4e);color:#fff;
 }
-.login-box .btn:active{ opacity:.7; }
-.login-box .hint{ font-size:11px; color:#c4b5a5; margin-top:10px; line-height:1.5; }
+.login-box .btn:active{opacity:.75}
+.login-box .hint{font-size:11px;color:#ccbbaa;margin-top:12px;line-height:1.6}
 
-/* ===== SETTINGS MODAL ===== */
+/* modals */
 .modal-mask{
-  position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index:400;
-  display:flex; align-items:flex-end; justify-content:center;
+  position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:500;
+  display:flex;align-items:flex-end;justify-content:center;
 }
 .modal-sheet{
-  background:#fff; border-radius:20px 20px 0 0; padding:24px 20px 32px;
-  width:100%; max-width:430px; animation:slideUp .25s ease;
+  background:#fff;border-radius:22px 22px 0 0;padding:24px 20px 32px;
+  width:100%;max-width:430px;animation:slideUp .25s ease;max-height:85vh;overflow-y:auto;
 }
-@keyframes slideUp{ from{ transform:translateY(100%); } to{ transform:translateY(0); } }
-.modal-sheet h3{ font-size:16px; margin-bottom:14px; color:#5b3a29; font-weight:640; }
-.modal-sheet label{ font-size:12px; color:#8b6f56; display:block; margin-bottom:2px; }
-.modal-sheet input{
-  width:100%; padding:12px 14px; border:1px solid #e8dfd5; border-radius:10px;
-  font-size:15px; margin-bottom:10px; outline:none; background:#faf8f5;
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-sheet h3{font-size:16px;margin-bottom:14px;color:#5b3a29;font-weight:640}
+.modal-sheet label{font-size:12px;color:#8b6f56;display:block;margin-bottom:3px}
+.modal-sheet input,.modal-sheet textarea{
+  width:100%;padding:12px 14px;border:1.5px solid #e8dfd5;border-radius:12px;
+  font-size:15px;margin-bottom:10px;outline:none;background:#fdf9f6;transition:border-color .2s;
 }
-.modal-sheet input:focus{ border-color:#d4855e; }
-.modal-btns{ display:flex; gap:8px; margin-top:6px; }
-.modal-btns button{ flex:1; padding:13px; border-radius:12px; font-size:14px; cursor:pointer; border:none; font-weight:500; }
-.modal-btns .ok{ background:#d4855e; color:#fff; }
-.modal-btns .cancel{ background:#f0e6da; color:#8b6f56; }
+.modal-sheet input:focus,.modal-sheet textarea:focus{border-color:#d4855e}
+.modal-sheet textarea{resize:none;height:72px}
+.modal-btns{display:flex;gap:8px;margin-top:4px}
+.modal-btns button{flex:1;padding:13px;border-radius:14px;font-size:14px;cursor:pointer;border:none;font-weight:500}
+.modal-btns .ok{background:linear-gradient(135deg,#d4855e,#cf7a4e);color:#fff}
+.modal-btns .cancel{background:#f5ede5;color:#8b6f56}
 
-/* ===== COUNTDOWN ===== */
+/* countdown */
 .cd-card{
-  background:linear-gradient(145deg,#5b3a29,#7a4f38); border-radius:22px;
-  padding:32px 24px 28px; color:#fff; text-align:center; margin-top:4px;
-  box-shadow:0 12px 40px rgba(91,58,41,0.18);
+  background:linear-gradient(145deg,#5b3a29,#7a4f38);border-radius:24px;
+  padding:34px 24px 30px;color:#fff;text-align:center;margin-top:6px;
+  box-shadow:0 12px 40px rgba(91,58,41,0.2);
 }
-.cd-card .cd-label{ font-size:12px; opacity:.78; letter-spacing:2px; font-weight:500; }
-.cd-card .cd-num{ font-size:72px; font-weight:180; line-height:1; margin:10px 0 6px; letter-spacing:-3px; }
-.cd-card .cd-date{ font-size:13px; opacity:.7; }
-.cd-set{ text-align:center; margin-top:14px; }
-.cd-set button{ background:none; border:none; color:#d4855e; font-size:13px; cursor:pointer; font-weight:500; }
+.cd-card .cd-label{font-size:11px;opacity:.75;letter-spacing:3px;font-weight:500}
+.cd-card .cd-num{font-size:76px;font-weight:160;line-height:1;margin:12px 0 8px;letter-spacing:-4px}
+.cd-card .cd-date{font-size:13px;opacity:.65}
+.cd-set{text-align:center;margin-top:16px}
+.cd-set button{background:none;border:none;color:#d4855e;font-size:13px;cursor:pointer;font-weight:500}
 
 .plan-row{
-  display:flex; align-items:center; gap:10px; padding:12px 14px;
-  background:#fff; border-radius:12px; margin-bottom:7px; box-shadow:0 1px 3px rgba(0,0,0,0.03);
+  display:flex;align-items:center;gap:10px;padding:13px 14px;background:#fff;
+  border-radius:14px;margin-bottom:7px;box-shadow:0 2px 12px rgba(0,0,0,0.03);
+  border:1px solid rgba(232,210,195,0.25);
 }
 .plan-dot{
-  width:20px; height:20px; border-radius:50%; border:2px solid #d4c5b5; cursor:pointer;
-  flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px;
-  color:transparent; transition:all .2s;
+  width:22px;height:22px;border-radius:50%;border:2px solid #dcc8b8;cursor:pointer;
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;
+  color:transparent;transition:all .25s
 }
-.plan-dot.ok{ background:#d4855e; border-color:#d4855e; color:#fff; }
-.plan-txt{ flex:1; font-size:14px; }
-.plan-del{ color:#c4b5a5; font-size:14px; cursor:pointer; padding:2px 4px; }
-.add-row{ display:flex; gap:8px; margin-top:6px; }
-.add-row input{
-  flex:1; padding:11px 14px; border:1px solid #e8dfd5; border-radius:10px;
-  outline:none; background:#fff; font-size:14px;
-}
-.add-row input:focus{ border-color:#d4855e; }
-.add-row button{
-  padding:11px 18px; background:#d4855e; color:#fff; border:none;
-  border-radius:10px; font-size:14px; cursor:pointer; font-weight:500; white-space:nowrap;
-}
+.plan-dot.ok{background:#d4855e;border-color:#d4855e;color:#fff}
+.plan-txt{flex:1;font-size:14px}
+.plan-del{color:#ccbbaa;font-size:15px;cursor:pointer;padding:2px 4px}
+.add-row{display:flex;gap:8px;margin-top:8px}
+.add-row input{flex:1;padding:12px 14px;border:1.5px solid #e8dfd5;border-radius:12px;outline:none;background:#fff;font-size:14px}
+.add-row input:focus{border-color:#d4855e}
+.add-row button{padding:12px 20px;background:linear-gradient(135deg,#d4855e,#cf7a4e);color:#fff;border:none;border-radius:12px;font-size:14px;cursor:pointer;font-weight:500;white-space:nowrap}
+.add-row button:active{opacity:.75}
 
-/* ===== MOOD ===== */
-.mood-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:4px; }
+/* mood */
+.mood-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px}
 .mood-tile{
-  background:#fff; border-radius:16px; padding:18px 10px; text-align:center; cursor:pointer;
-  border:2px solid transparent; transition:all .2s; box-shadow:0 1px 4px rgba(0,0,0,0.03);
+  background:#fff;border-radius:18px;padding:20px 10px;text-align:center;cursor:pointer;
+  border:2px solid transparent;transition:all .2s;box-shadow:0 2px 10px rgba(0,0,0,0.03);
 }
-.mood-tile:active{ transform:scale(0.94); }
-.mood-tile.sel{ border-color:#d4855e; background:#fef9f5; }
-.mood-tile .emo{ font-size:34px; line-height:1; }
-.mood-tile .lbl{ font-size:11px; color:#8b6f56; margin-top:4px; font-weight:500; }
-.mood-duo{ display:flex; gap:12px; margin-top:20px; }
+.mood-tile:active{transform:scale(0.94)}
+.mood-tile.sel{border-color:#d4855e;background:linear-gradient(180deg,#fff,#fef5f0)}
+.mood-tile .emo{font-size:34px;line-height:1}
+.mood-tile .lbl{font-size:11px;color:#8b6f56;margin-top:5px;font-weight:500}
+.mood-duo{display:flex;gap:14px;margin-top:22px}
 .mood-card{
-  flex:1; background:#fff; border-radius:18px; padding:18px 12px;
-  text-align:center; box-shadow:0 1px 4px rgba(0,0,0,0.03);
+  flex:1;background:#fff;border-radius:20px;padding:20px 12px;text-align:center;
+  box-shadow:0 2px 14px rgba(0,0,0,0.04);border:1px solid rgba(232,210,195,0.2);
 }
-.mood-card .who{ font-size:11px; color:#8b6f56; font-weight:500; margin-bottom:6px; }
-.mood-card .big{ font-size:44px; line-height:1; padding:4px; }
+.mood-card .who{font-size:11px;color:#8b6f56;font-weight:500;margin-bottom:8px}
+.mood-card .big{font-size:48px;line-height:1;padding:4px}
 
-/* ===== DAILY Q ===== */
+/* daily q */
 .dq-card{
-  background:#fff; border-radius:20px; padding:26px 20px; text-align:center;
-  box-shadow:0 2px 8px rgba(0,0,0,0.04); margin-top:4px;
+  background:#fff;border-radius:22px;padding:28px 20px;text-align:center;
+  box-shadow:0 4px 20px rgba(0,0,0,0.04);margin-top:6px;border:1px solid rgba(232,210,195,0.2);
 }
-.dq-badge{ font-size:10px; letter-spacing:2px; color:#d4855e; margin-bottom:10px; font-weight:600; }
-.dq-text{ font-size:17px; font-weight:500; line-height:1.55; color:#3d322b; margin-bottom:18px; }
-.dq-ans{ display:flex; gap:8px; }
-.dq-ans input{ flex:1; padding:12px 14px; border:1px solid #e8dfd5; border-radius:12px; outline:none; background:#faf8f5; }
-.dq-ans input:focus{ border-color:#d4855e; }
-.dq-ans button{ padding:12px 20px; background:#d4855e; color:#fff; border:none; border-radius:12px; font-size:14px; cursor:pointer; font-weight:500; }
-.dq-reveal{ margin-top:16px; padding:16px; background:#fef9f5; border-radius:12px; display:none; text-align:left; }
-.dq-reveal.show{ display:block; }
-.dq-reveal .line{ font-size:14px; margin-bottom:5px; line-height:1.5; }
-.dq-reveal .who{ font-size:11px; color:#8b6f56; font-weight:500; }
+.dq-badge{font-size:10px;letter-spacing:3px;color:#d4855e;margin-bottom:12px;font-weight:600}
+.dq-text{font-size:17px;font-weight:500;line-height:1.6;color:#3d322b;margin-bottom:20px}
+.dq-ans{display:flex;gap:8px}
+.dq-ans input{flex:1;padding:12px 14px;border:1.5px solid #e8dfd5;border-radius:14px;outline:none;background:#fdf9f6}
+.dq-ans input:focus{border-color:#d4855e}
+.dq-ans button{padding:12px 22px;background:linear-gradient(135deg,#d4855e,#cf7a4e);color:#fff;border:none;border-radius:14px;font-size:14px;cursor:pointer;font-weight:500}
+.dq-ans button:active{opacity:.75}
+.dq-reveal{margin-top:18px;padding:18px;background:#fef9f5;border-radius:14px;display:none;text-align:left}
+.dq-reveal.show{display:block}
+.dq-reveal .line{font-size:14px;margin-bottom:6px;line-height:1.5}
+.dq-reveal .who{font-size:11px;color:#8b6f56;font-weight:500}
 
-/* ===== FRAGMENTS ===== */
-.frag-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:4px; }
+/* fragments */
+.frag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
 .frag-cell{
-  aspect-ratio:1; background:#e8dfd5; border-radius:14px; cursor:pointer;
-  overflow:hidden; display:flex; align-items:center; justify-content:center;
-  font-size:30px; transition:transform .15s; position:relative;
+  aspect-ratio:1;background:#fff;border-radius:16px;cursor:pointer;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+  transition:transform .15s;position:relative;border:1px solid rgba(232,210,195,0.2);
+  box-shadow:0 2px 10px rgba(0,0,0,0.03);
 }
-.frag-cell:active{ transform:scale(0.94); }
-.frag-cell img{ width:100%; height:100%; object-fit:cover; }
-.frag-cell .who-tag{
-  position:absolute; bottom:4px; left:4px; font-size:9px; padding:1px 6px;
-  border-radius:6px; background:rgba(0,0,0,0.5); color:#fff; max-width:calc(100% - 8px);
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+.frag-cell:active{transform:scale(0.94)}
+.frag-cell img{width:100%;height:100%;object-fit:cover}
+.frag-cell .frag-meta{
+  position:absolute;bottom:0;left:0;right:0;padding:4px 6px;
+  background:linear-gradient(transparent,rgba(0,0,0,0.4));color:#fff;
+  font-size:9px;display:flex;justify-content:space-between;align-items:flex-end;
 }
 .frag-add{
-  aspect-ratio:1; background:#fff; border:2px dashed #e8dfd5; border-radius:14px;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  cursor:pointer; color:#c4b5a5; font-size:11px; font-weight:500; gap:2px;
+  aspect-ratio:1;background:#fff;border:2px dashed #e8dfd5;border-radius:16px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;color:#ccbbaa;font-size:11px;font-weight:500;gap:4px;
+  transition:border-color .2s;
 }
-.frag-add .big{ font-size:26px; }
-.btn-del-frag{
-  position:absolute; top:3px; right:3px; width:18px; height:18px; border-radius:50%;
-  background:rgba(0,0,0,0.5); color:#fff; border:none; font-size:10px;
-  cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1;
-}
+.frag-add:hover{border-color:#d4855e}
+.frag-add .big{font-size:28px;font-weight:300}
 
-/* ===== FUND ===== */
-.fund-cards{ display:flex; gap:12px; margin-top:4px; }
+/* fragment detail modal */
+.frag-detail-img{
+  width:100%;border-radius:16px;margin-bottom:14px;max-height:300px;object-fit:cover;
+}
+.frag-detail-text{
+  font-size:15px;line-height:1.6;margin-bottom:12px;color:#3d322b;
+}
+.frag-detail-meta{font-size:11px;color:#8b6f56;margin-bottom:16px}
+.comment-list{margin-bottom:14px}
+.comment-item{
+  padding:10px 14px;background:#fdf9f6;border-radius:12px;margin-bottom:6px;font-size:13px;
+}
+.comment-item .cwho{font-size:10px;color:#d4855e;font-weight:500;margin-bottom:2px}
+.comment-item .cdate{font-size:10px;color:#ccbbaa;margin-left:6px}
+.comment-input-row{display:flex;gap:8px}
+.comment-input-row input{flex:1;padding:10px 14px;border:1.5px solid #e8dfd5;border-radius:12px;outline:none;background:#fdf9f6;font-size:14px}
+.comment-input-row input:focus{border-color:#d4855e}
+.comment-input-row button{padding:10px 16px;background:linear-gradient(135deg,#d4855e,#cf7a4e);color:#fff;border:none;border-radius:12px;font-size:13px;cursor:pointer;font-weight:500}
+
+/* new frag modal */
+.frag-create-area{text-align:center;margin-bottom:16px}
+.frag-create-area .upload-btn{
+  display:inline-block;padding:28px 40px;border:2px dashed #e8dfd5;border-radius:20px;
+  cursor:pointer;color:#ccbbaa;font-size:13px;transition:all .2s;
+}
+.frag-create-area .upload-btn:hover{border-color:#d4855e;color:#d4855e}
+.frag-create-area .upload-icon{font-size:40px;display:block;margin-bottom:6px}
+.frag-preview{width:100%;max-height:200px;object-fit:cover;border-radius:14px;margin-bottom:10px;display:none}
+
+/* fund */
+.fund-cards{display:flex;gap:14px;margin-top:6px}
 .fund-card{
-  flex:1; border-radius:18px; padding:20px 14px; text-align:center; color:#fff;
-  box-shadow:0 8px 28px rgba(0,0,0,0.12);
+  flex:1;border-radius:20px;padding:22px 14px;text-align:center;color:#fff;
+  box-shadow:0 10px 32px rgba(0,0,0,0.12);
 }
-.fund-card.me{ background:linear-gradient(145deg,#d4855e,#e8a57a); }
-.fund-card.ta{ background:linear-gradient(145deg,#7a4f38,#9b6d50); }
-.fund-card .fwho{ font-size:11px; opacity:.85; letter-spacing:1px; font-weight:500; }
-.fund-card .famt{ font-size:42px; font-weight:200; line-height:1; margin:6px 0 2px; }
-.fund-card .famt em{ font-size:13px; font-style:normal; font-weight:400; }
+.fund-card.me{background:linear-gradient(145deg,#d4855e,#e09a6e)}
+.fund-card.ta{background:linear-gradient(145deg,#7a4f38,#9b6e52)}
+.fund-card .fwho{font-size:11px;opacity:.82;letter-spacing:1px;font-weight:500}
+.fund-card .famt{font-size:44px;font-weight:180;line-height:1;margin:8px 0 4px}
+.fund-card .famt em{font-size:13px;font-style:normal;font-weight:400}
 
-.act-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:4px; }
+.act-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:6px}
 .act-card{
-  background:#fff; border-radius:14px; padding:16px 12px; text-align:center; cursor:pointer;
-  box-shadow:0 1px 3px rgba(0,0,0,0.03); border:2px solid transparent; transition:all .15s;
+  background:#fff;border-radius:16px;padding:18px 12px;text-align:center;cursor:pointer;
+  box-shadow:0 2px 12px rgba(0,0,0,0.03);border:2px solid transparent;transition:all .15s;
+  border:1px solid rgba(232,210,195,0.2);
 }
-.act-card:active{ border-color:#d4855e; transform:scale(0.97); }
-.act-card .emo{ font-size:30px; }
-.act-card .lab{ font-size:13px; font-weight:500; margin:3px 0 1px; }
-.act-card .pts{ font-size:11px; font-weight:500; }
-.act-card .pts.earn{ color:#d4855e; }
-.act-card .pts.spend{ color:#7a4f38; }
+.act-card:active{border-color:#d4855e;transform:scale(0.96)}
+.act-card .emo{font-size:30px}
+.act-card .lab{font-size:13px;font-weight:500;margin:4px 0 2px}
+.act-card .pts{font-size:11px;font-weight:500}
+.act-card .pts.earn{color:#d4855e}
+.act-card .pts.spend{color:#7a4f38}
 
 .hist-item{
-  display:flex; align-items:center; justify-content:space-between; padding:10px 14px;
-  background:#fff; border-radius:10px; margin-bottom:5px; font-size:13px;
-  box-shadow:0 1px 3px rgba(0,0,0,0.03);
+  display:flex;align-items:center;justify-content:space-between;padding:11px 14px;
+  background:#fff;border-radius:12px;margin-bottom:5px;font-size:13px;
+  box-shadow:0 1px 6px rgba(0,0,0,0.02);border:1px solid rgba(232,210,195,0.15);
 }
-.hist-item .val{ font-weight:600; }
-.hist-item .val.earn{ color:#d4855e; }
-.hist-item .val.spend{ color:#7a4f38; }
+.hist-item .val{font-weight:600}
+.hist-item .val.earn{color:#d4855e}
+.hist-item .val.spend{color:#7a4f38}
 
-/* ===== WISHLIST ===== */
+/* wishlist */
 .wish-row{
-  display:flex; align-items:center; gap:10px; padding:12px 14px; background:#fff;
-  border-radius:14px; margin-bottom:8px; box-shadow:0 1px 3px rgba(0,0,0,0.03);
+  display:flex;align-items:center;gap:10px;padding:13px 14px;background:#fff;
+  border-radius:16px;margin-bottom:8px;box-shadow:0 2px 12px rgba(0,0,0,0.03);
+  border:1px solid rgba(232,210,195,0.2);
 }
-.wish-icon{ width:48px; height:48px; background:#faf8f5; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
-.wish-body{ flex:1; min-width:0; }
-.wish-body .wn{ font-size:14px; font-weight:500; }
-.wish-body .wm{ font-size:11px; color:#8b6f56; margin-top:1px; }
-.wish-tag{ font-size:10px; padding:3px 8px; border-radius:8px; font-weight:500; flex-shrink:0; }
-.wish-tag.want{ background:#f0e6da; color:#8b6f56; }
-.wish-tag.buying{ background:#fef9f5; color:#d4855e; }
-.wish-tag.bought{ background:#e8dfd5; color:#5b3a29; }
-.wish-act{ font-size:10px; padding:4px 8px; border-radius:6px; border:1px solid #d4855e; background:#fff; color:#d4855e; cursor:pointer; font-weight:500; white-space:nowrap; }
-.btn-add{ width:100%; padding:14px; border:2px dashed #e8dfd5; border-radius:14px; background:#fff; font-size:13px; color:#c4b5a5; cursor:pointer; font-weight:500; }
+.wish-icon{width:50px;height:50px;background:linear-gradient(135deg,#fef9f5,#fdf2ea);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.wish-body{flex:1;min-width:0}
+.wish-body .wn{font-size:14px;font-weight:500}
+.wish-body .wm{font-size:11px;color:#8b6f56;margin-top:2px}
+.wish-tag{font-size:10px;padding:4px 10px;border-radius:10px;font-weight:500;flex-shrink:0}
+.wish-tag.want{background:#f5ede5;color:#8b6f56}
+.wish-tag.buying{background:#fef5f0;color:#d4855e}
+.wish-tag.bought{background:#e8dfd5;color:#5b3a29}
+.wish-act{font-size:10px;padding:5px 10px;border-radius:8px;border:1px solid #d4855e;background:#fff;color:#d4855e;cursor:pointer;font-weight:500;white-space:nowrap}
+.btn-add{width:100%;padding:15px;border:2px dashed #e8dfd5;border-radius:16px;background:#fff;font-size:13px;color:#ccbbaa;cursor:pointer;font-weight:500;transition:border-color .2s}
+.btn-add:hover{border-color:#d4855e}
 </style>
 </head>
 <body>
 
-<!-- ===== LOGIN ===== -->
+<div class="bg-hearts">
+  <span>♡</span><span>♥</span><span>♡</span><span>♥</span><span>♡</span><span>♥</span>
+</div>
+
+<!-- LOGIN -->
 <div class="login-mask" id="loginScreen">
   <div class="login-box">
     <div class="logo">💑</div>
     <h2>我们之间</h2>
-    <p class="desc">输入你的名字进入</p>
+    <p class="desc">输入你的名字</p>
     <input type="text" id="loginName" placeholder="你的名字" maxlength="20" autocomplete="off">
     <button class="btn" onclick="doLogin()">进入</button>
-    <p class="hint">你和 TA 各用各的名字<br>比如她输入 lixiang，你输入 zhangyi</p>
+    <p class="hint">她输 lixiang，你输 zhangyi<br>各进各的，数据一起同步</p>
   </div>
 </div>
 
-<!-- ===== HEADER ===== -->
+<!-- HEADER -->
 <div class="header">
   <h1>我们之间</h1>
   <div class="header-right">
-    <span class="sync-dot off" id="syncDot" title="同步状态"></span>
+    <span class="sync-dot off" id="syncDot"></span>
     <span class="my-name-tag" id="nameTag">我</span>
-    <button class="btn-gear" onclick="openSettings()" title="设置">⚙</button>
+    <button class="btn-gear" onclick="openSettings()">⚙</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- ===== SETTINGS MODAL ===== -->
-<div class="modal-mask" id="settingsModal" style="display:none;">
+<!-- SETTINGS MODAL -->
+<div class="modal-mask" id="settingsModal" style="display:none">
   <div class="modal-sheet">
     <h3>同步设置</h3>
     <label>配对码</label>
@@ -303,12 +376,12 @@ input,textarea{ font-size:16px; }
       <button class="cancel" onclick="closeSettings()">取消</button>
       <button class="ok" onclick="saveSettings()">保存并同步</button>
     </div>
-    <p style="font-size:11px;color:#c4b5a5;text-align:center;margin-top:12px;">你的名字: <span id="settingsName"></span></p>
+    <p style="font-size:11px;color:#ccbbaa;text-align:center;margin-top:12px">你的名字: <span id="settingsName"></span></p>
   </div>
 </div>
 
-<!-- ===== WISHLIST MODAL ===== -->
-<div class="modal-mask" id="wishModal" style="display:none;">
+<!-- WISHLIST MODAL -->
+<div class="modal-mask" id="wishModal" style="display:none">
   <div class="modal-sheet">
     <h3>添加心愿</h3>
     <input type="text" id="wmName" placeholder="想要什么？">
@@ -319,8 +392,32 @@ input,textarea{ font-size:16px; }
   </div>
 </div>
 
-<!-- ===== PAGES ===== -->
+<!-- FRAGMENT DETAIL MODAL -->
+<div class="modal-mask" id="fragDetailModal" style="display:none">
+  <div class="modal-sheet" id="fragDetailContent"></div>
+</div>
 
+<!-- ADD FRAGMENT MODAL -->
+<div class="modal-mask" id="fragAddModal" style="display:none">
+  <div class="modal-sheet">
+    <h3>添加碎片</h3>
+    <div class="frag-create-area">
+      <label class="upload-btn" id="uploadLabel">
+        <span class="upload-icon">📷</span>
+        <span>点击添加照片（可选）</span>
+        <input type="file" accept="image/*" style="display:none" id="fragFileInput" onchange="previewFragImg(event)">
+      </label>
+      <img class="frag-preview" id="fragPreview">
+    </div>
+    <input type="text" id="fragText" placeholder="说点什么...">
+    <div class="modal-btns">
+      <button class="cancel" onclick="closeFragAdd()">取消</button>
+      <button class="ok" onclick="saveFragment()">发布</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGES -->
 <!-- COUNTDOWN -->
 <div class="page show" id="pg-countdown">
   <div class="cd-card">
@@ -339,7 +436,7 @@ input,textarea{ font-size:16px; }
 
 <!-- MOOD -->
 <div class="page" id="pg-mood">
-  <p style="font-size:12px;color:#8b6f56;margin:4px 0 14px;">今天的心情</p>
+  <p style="font-size:12px;color:#8b6f56;margin:6px 0 16px">今天的心情</p>
   <div class="mood-grid" id="moodGrid"></div>
   <div class="mood-duo">
     <div class="mood-card">
@@ -371,11 +468,8 @@ input,textarea{ font-size:16px; }
 
 <!-- FRAGMENTS -->
 <div class="page" id="pg-fragments">
-  <p style="font-size:12px;color:#8b6f56;margin:4px 0 10px;">随手记录，让 TA 看到你的日常</p>
-  <div class="frag-grid" id="fragGrid">
-    <div class="frag-add" onclick="openFragPicker()"><span class="big">+</span>碎片</div>
-  </div>
-  <input type="file" id="fragFileInput" accept="image/*" style="display:none" onchange="onFragFilePicked(event)">
+  <p style="font-size:12px;color:#8b6f56;margin:6px 0 10px">随手记录，让 TA 看到你的日常</p>
+  <div class="frag-grid" id="fragGrid"></div>
 </div>
 
 <!-- FUND -->
@@ -400,12 +494,12 @@ input,textarea{ font-size:16px; }
 
 <!-- WISHLIST -->
 <div class="page" id="pg-wishlist">
-  <p style="font-size:12px;color:#8b6f56;margin:4px 0 10px;">写下想要的小心愿，TA 会悄悄看到</p>
+  <p style="font-size:12px;color:#8b6f56;margin:6px 0 10px">写下想要的小心愿，TA 会悄悄看到</p>
   <div id="wishList"></div>
   <button class="btn-add" onclick="openWish()">+ 添加心愿</button>
 </div>
 
-<!-- ===== TAB BAR ===== -->
+<!-- TAB BAR -->
 <div class="tab-bar">
   <button class="tab-btn on" onclick="goPage('countdown')"><span class="ico">⏳</span>见面</button>
   <button class="tab-btn" onclick="goPage('mood')"><span class="ico">💡</span>心情</button>
@@ -416,32 +510,17 @@ input,textarea{ font-size:16px; }
 </div>
 
 <script>
-// ==================== 全局 ====================
+// ==================== 数据 ====================
 const D = {
-  meetDate: null,
-  plans: [],
-  moods: {},        // { "zhangyi": 2, "lixiang": null }
-  qDate: '',
-  answers: {},      // { "zhangyi": "xxx", "lixiang": "xxx" }
-  fragments: [],    // [{ who, text, emoji, img, date }]
-  funds: {},        // { "zhangyi": 10, "lixiang": 5 }
-  fundHistory: [],  // [{ who, label, amount, time }]
-  wishlist: [],     // shared
+  meetDate: null, plans: [], moods: {}, qDate: '', answers: {},
+  fragments: [], funds: {}, fundHistory: [], wishlist: [],
 };
+let MY_NAME = '', PARTNER_NAME = '', currentPage = 'countdown', syncTimer = null;
+const LC = 'us_data_v3', LC_MY = 'us_myname';
+let fragImgData = null; // 临时存储正在添加的碎片图片
 
-let MY_NAME = '';
-let PARTNER_NAME = '';
-let currentPage = 'countdown';
-let syncTimer = null;
-const LC = 'us_data_v3';
-const LC_MY = 'us_myname';
-
-// ==================== 本地存储 ====================
 function localLoad() {
-  try {
-    const raw = localStorage.getItem(LC);
-    if (raw) Object.assign(D, JSON.parse(raw));
-  } catch(e) {}
+  try { const r = localStorage.getItem(LC); if (r) Object.assign(D, JSON.parse(r)); } catch(e) {}
 }
 function localSave() {
   try { localStorage.setItem(LC, JSON.stringify(D)); } catch(e) {}
@@ -456,14 +535,9 @@ function getSBConfig() {
   };
 }
 function saveSBConfig(url, key, code) {
-  localStorage.setItem('us_sb_url', url);
-  localStorage.setItem('us_sb_key', key);
-  localStorage.setItem('us_sb_code', code);
+  localStorage.setItem('us_sb_url', url); localStorage.setItem('us_sb_key', key); localStorage.setItem('us_sb_code', code);
 }
-function sbReady() {
-  const c = getSBConfig();
-  return !!(c.url && c.key && c.code);
-}
+function sbReady() { const c = getSBConfig(); return !!(c.url && c.key && c.code); }
 
 async function cloudLoad() {
   if (!sbReady()) return null;
@@ -477,14 +551,9 @@ async function cloudLoad() {
     if (!rows || rows.length === 0) return null;
     const d = rows[0].data;
     if (!d) return null;
-    if (d.meetDate || (d.plans && d.plans.length > 0) ||
-        (d.moods && Object.keys(d.moods).length > 0) ||
-        (d.fragments && d.fragments.length > 0) ||
-        (d.funds && (d.funds[MY_NAME] > 0 || (PARTNER_NAME && d.funds[PARTNER_NAME] > 0))) ||
-        (d.wishlist && d.wishlist.length > 0) ||
-        (d.answers && Object.keys(d.answers).length > 0)) {
-      return d;
-    }
+    if (d.meetDate || (d.plans && d.plans.length) || (d.moods && Object.keys(d.moods).length) ||
+        (d.fragments && d.fragments.length) || (d.funds && Object.keys(d.funds).some(k => d.funds[k] > 0)) ||
+        (d.wishlist && d.wishlist.length) || (d.answers && Object.keys(d.answers).length)) return d;
     return null;
   } catch(e) { return null; }
 }
@@ -517,17 +586,11 @@ async function cloudSave() {
 }
 
 function updateSync(status) {
-  const dot = document.getElementById('syncDot');
-  dot.className = 'sync-dot ' + status;
+  document.getElementById('syncDot').className = 'sync-dot ' + status;
 }
-
 async function persistAndSync() {
   localSave();
-  if (sbReady()) {
-    updateSync('loading');
-    const ok = await cloudSave();
-    updateSync(ok ? 'on' : 'off');
-  }
+  if (sbReady()) { updateSync('loading'); const ok = await cloudSave(); updateSync(ok ? 'on' : 'off'); }
 }
 
 // ==================== 登录 ====================
@@ -538,44 +601,33 @@ function doLogin() {
   localStorage.setItem(LC_MY, name);
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('nameTag').textContent = name;
-  // 初始化空的 funds/moods
-  if (!D.funds) D.funds = {};
-  if (D.funds[name] === undefined) D.funds[name] = 0;
-  if (!D.moods) D.moods = {};
-  if (D.moods[name] === undefined) D.moods[name] = null;
-  if (!D.answers) D.answers = {};
-  if (D.answers[name] === undefined) D.answers[name] = '';
+  if (!D.funds) D.funds = {}; if (D.funds[name] === undefined) D.funds[name] = 0;
+  if (!D.moods) D.moods = {}; if (D.moods[name] === undefined) D.moods[name] = null;
+  if (!D.answers) D.answers = {}; if (D.answers[name] === undefined) D.answers[name] = '';
   initAfterLogin();
 }
 
 function guessPartner() {
-  // 从 moods/funds/answers 里找另一个名字
-  const names = new Set([...Object.keys(D.moods || {}), ...Object.keys(D.funds || {}), ...Object.keys(D.answers || {})]);
+  const names = new Set([...Object.keys(D.moods||{}),...Object.keys(D.funds||{}),...Object.keys(D.answers||{})]);
+  (D.fragments||[]).forEach(f => { if (f.who && f.who !== MY_NAME) names.add(f.who); if (f.comments) f.comments.forEach(c => { if (c.who !== MY_NAME) names.add(c.who); }); });
+  (D.fundHistory||[]).forEach(h => { if (h.who && h.who !== MY_NAME) names.add(h.who); });
   names.delete(MY_NAME);
-  // 也检查 fragments
-  (D.fragments || []).forEach(f => { if (f.who && f.who !== MY_NAME) names.add(f.who); });
-  (D.fundHistory || []).forEach(h => { if (h.who && h.who !== MY_NAME) names.add(h.who); });
   if (names.size > 0) PARTNER_NAME = [...names][0];
 }
 
-// ==================== 页面导航 ====================
+// ==================== 导航 ====================
 function goPage(name) {
   currentPage = name;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
   document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('on'));
-  const pg = document.getElementById('pg-' + name);
-  if (pg) pg.classList.add('show');
+  const pg = document.getElementById('pg-'+name); if (pg) pg.classList.add('show');
   const map = { countdown:0, mood:1, dailyq:2, fragments:3, fund:4, wishlist:5 };
   const tabs = document.querySelectorAll('.tab-btn');
   if (tabs[map[name]]) tabs[map[name]].classList.add('on');
-  renderPage(name);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  renderPage(name); window.scrollTo({top:0, behavior:'smooth'});
 }
-
 function renderCurrent() { renderPage(currentPage); }
-function renderAll() {
-  ['countdown','mood','dailyq','fragments','fund','wishlist'].forEach(renderPage);
-}
+function renderAll() { ['countdown','mood','dailyq','fragments','fund','wishlist'].forEach(renderPage); }
 function renderPage(name) {
   switch(name) {
     case 'countdown': rCountdown(); break;
@@ -589,50 +641,44 @@ function renderPage(name) {
 
 // ==================== COUNTDOWN ====================
 function rCountdown() {
-  const num = document.getElementById('cdNum');
-  const date = document.getElementById('cdDate');
+  const num = document.getElementById('cdNum'), date = document.getElementById('cdDate');
   if (D.meetDate) {
-    const t = new Date(D.meetDate);
-    const diff = Math.ceil((t - new Date()) / 86400000);
+    const t = new Date(D.meetDate), diff = Math.ceil((t - new Date()) / 86400000);
     num.textContent = diff > 0 ? diff : (diff === 0 ? '今天!' : '已过去');
-    date.textContent = diff > 0 ? t.toLocaleDateString('zh-CN', { month:'long', day:'numeric', weekday:'long' })
-      : (diff === 0 ? '就是今天!' : '期待下一次');
+    date.textContent = diff > 0 ? t.toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'}) : (diff === 0 ? '就是今天!' : '期待下一次');
   } else { num.textContent = '--'; date.textContent = '请设置见面日期'; }
   rPlans();
 }
 function pickDate() {
   const s = prompt('输入见面日期 (YYYY-MM-DD)：', D.meetDate || '');
   if (s && /^\d{4}-\d{2}-\d{2}$/.test(s)) { D.meetDate = s; persistAndSync(); rCountdown(); }
-  else if (s) alert('格式不对');
+  else if (s) alert('格式不对，请输入 YYYY-MM-DD');
 }
 function rPlans() {
-  document.getElementById('planList').innerHTML = (D.plans || []).map((p, i) => `
+  document.getElementById('planList').innerHTML = (D.plans||[]).map((p,i) => `
     <div class="plan-row">
-      <div class="plan-dot ${p.done ? 'ok' : ''}" onclick="togPlan(${i})">${p.done ? '✓' : ''}</div>
-      <span class="plan-txt" style="${p.done ? 'text-decoration:line-through;color:#c4b5a5' : ''}">${esc(p.text)}</span>
+      <div class="plan-dot ${p.done?'ok':''}" onclick="togPlan(${i})">${p.done?'✓':''}</div>
+      <span class="plan-txt" style="${p.done?'text-decoration:line-through;color:#ccbbaa':''}">${esc(p.text)}</span>
       <span class="plan-del" onclick="delPlan(${i})">✕</span>
     </div>`).join('');
 }
 function addPlan() {
-  const v = document.getElementById('planInput').value.trim();
-  if (!v) return;
-  if (!D.plans) D.plans = [];
-  D.plans.push({ text: v, done: false });
-  document.getElementById('planInput').value = '';
-  persistAndSync(); rPlans();
+  const v = document.getElementById('planInput').value.trim(); if (!v) return;
+  if (!D.plans) D.plans = []; D.plans.push({text:v,done:false});
+  document.getElementById('planInput').value = ''; persistAndSync(); rPlans();
 }
 function togPlan(i) { D.plans[i].done = !D.plans[i].done; persistAndSync(); rPlans(); }
-function delPlan(i) { D.plans.splice(i, 1); persistAndSync(); rPlans(); }
+function delPlan(i) { D.plans.splice(i,1); persistAndSync(); rPlans(); }
 
 // ==================== MOOD ====================
 const MOODS = [
-  { e:'😊', l:'开心' }, { e:'🥰', l:'想念' }, { e:'😴', l:'疲惫' }, { e:'😤', l:'烦躁' },
-  { e:'😢', l:'难过' }, { e:'🎉', l:'兴奋' }, { e:'😌', l:'平静' }, { e:'🤔', l:'思考中' },
+  { e:'😊', l:'开心' },{ e:'🥰', l:'想念' },{ e:'😴', l:'疲惫' },{ e:'😤', l:'烦躁' },
+  { e:'😢', l:'难过' },{ e:'🎉', l:'兴奋' },{ e:'😌', l:'平静' },{ e:'🤔', l:'思考中' },
 ];
 function rMood() {
   const myMood = D.moods[MY_NAME];
-  document.getElementById('moodGrid').innerHTML = MOODS.map((m, i) => `
-    <div class="mood-tile ${myMood === i ? 'sel' : ''}" onclick="setMood(${i})">
+  document.getElementById('moodGrid').innerHTML = MOODS.map((m,i) => `
+    <div class="mood-tile ${myMood===i?'sel':''}" onclick="setMood(${i})">
       <div class="emo">${m.e}</div><div class="lbl">${m.l}</div>
     </div>`).join('');
   document.getElementById('moodLabelMe').textContent = MY_NAME;
@@ -641,26 +687,21 @@ function rMood() {
   const taMood = PARTNER_NAME ? D.moods[PARTNER_NAME] : null;
   document.getElementById('moodEmojiTa').textContent = taMood != null ? MOODS[taMood].e : '🌙';
 }
-function setMood(i) {
-  D.moods[MY_NAME] = (D.moods[MY_NAME] === i ? null : i);
-  persistAndSync(); rMood();
-}
+function setMood(i) { D.moods[MY_NAME] = (D.moods[MY_NAME]===i ? null : i); persistAndSync(); rMood(); }
 
 // ==================== DAILY Q ====================
 const QS = [
   '今天让你最想TA的瞬间是什么？','下次见面想住民宿还是酒店？','如果现在出现在TA面前，你最想做什么？',
   'TA做过最让你感动的事？','最近压力大吗？想对TA说什么？','在一起最舒服的状态是什么样？',
-  '说一件今天的小事给TA听。','下次见面最想一起吃什么？','异地最难和最甜的分别是什么？',
-  '用三个词形容今天的情绪。',
+  '说一件今天的小事给TA听。','下次见面最想一起吃什么？','异地最难和最甜的分别是什么？','用三个词形容今天的情绪。',
 ];
 function rDailyQ() {
   const today = new Date().toISOString().slice(0,10);
   if (D.qDate !== today) { D.qDate = today; D.answers = {}; persistAndSync(); }
   document.getElementById('dqQ').textContent = QS[parseInt(today.replace(/-/g,'')) % QS.length];
-  const myAns = D.answers[MY_NAME];
-  const taAns = PARTNER_NAME ? D.answers[PARTNER_NAME] : '';
+  const myAns = D.answers[MY_NAME], taAns = PARTNER_NAME ? D.answers[PARTNER_NAME] : '';
   document.getElementById('dqWhoMe').textContent = MY_NAME + '：';
-  document.getElementById('dqWhoTa').textContent = (PARTNER_NAME || 'TA') + '：';
+  document.getElementById('dqWhoTa').textContent = (PARTNER_NAME||'TA') + '：';
   if (myAns) {
     document.getElementById('dqInputArea').style.display = 'none';
     document.getElementById('dqReveal').classList.add('show');
@@ -673,88 +714,132 @@ function rDailyQ() {
   }
 }
 function submitAnswer() {
-  const v = document.getElementById('dqInput').value.trim();
-  if (!v) return;
-  D.answers[MY_NAME] = v;
-  persistAndSync(); rDailyQ();
+  const v = document.getElementById('dqInput').value.trim(); if (!v) return;
+  D.answers[MY_NAME] = v; persistAndSync(); rDailyQ();
 }
 
 // ==================== FRAGMENTS ====================
 function rFragments() {
-  let h = (D.fragments || []).map((f, i) => `
-    <div class="frag-cell" onclick="viewFrag(${i})">
-      ${f.img ? '<img src="' + f.img + '" alt="">' : '<span>' + (f.emoji || '📝') + '</span>'}
-      <span class="who-tag">${f.who || ''}</span>
-      ${f.who === MY_NAME ? '<button class="btn-del-frag" onclick="event.stopPropagation();delFrag(' + i + ')">✕</button>' : ''}
-    </div>`).join('');
-  h += '<div class="frag-add" onclick="openFragPicker()"><span class="big">+</span>碎片</div>';
+  let h = (D.fragments||[]).map((f,i) => {
+    const d = f.date ? new Date(f.date) : null;
+    const dateStr = d ? (d.getMonth()+1)+'/'+d.getDate() : '';
+    return `<div class="frag-cell" onclick="openFragDetail(${i})">
+      ${f.img ? '<img src="'+f.img+'" alt="">' : '<span>'+(f.emoji||'📝')+'</span>'}
+      <div class="frag-meta"><span>${f.who||''}</span><span>${dateStr}</span></div>
+    </div>`;
+  }).join('');
+  h += `<div class="frag-add" onclick="openFragAdd()"><span class="big">+</span>碎片</div>`;
   document.getElementById('fragGrid').innerHTML = h;
 }
-function openFragPicker() {
-  document.getElementById('fragFileInput').click();
+
+function openFragAdd() {
+  fragImgData = null;
+  document.getElementById('fragPreview').style.display = 'none';
+  document.getElementById('fragText').value = '';
+  document.getElementById('fragFileInput').value = '';
+  document.getElementById('fragAddModal').style.display = 'flex';
 }
-function onFragFilePicked(e) {
-  const file = e.target.files[0];
-  if (!file) return;
+function closeFragAdd() { document.getElementById('fragAddModal').style.display = 'none'; }
+function previewFragImg(e) {
+  const file = e.target.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = function(ev) {
-    const text = prompt('给这张照片加句话（可选）：');
-    if (!D.fragments) D.fragments = [];
-    D.fragments.push({
-      who: MY_NAME,
-      text: text || '',
-      emoji: '📷',
-      img: ev.target.result,
-      date: new Date().toISOString()
-    });
-    persistAndSync(); rFragments();
+    fragImgData = ev.target.result;
+    const preview = document.getElementById('fragPreview');
+    preview.src = fragImgData; preview.style.display = 'block';
   };
   reader.readAsDataURL(file);
-  e.target.value = '';
 }
-function viewFrag(i) {
+function saveFragment() {
+  const text = document.getElementById('fragText').value.trim();
+  if (!fragImgData && !text) { alert('至少发张照片或写句话'); return; }
+  if (!D.fragments) D.fragments = [];
+  D.fragments.push({
+    who: MY_NAME, text: text || '', emoji: fragImgData ? '📷' : (text.length <= 3 ? text : '💬'),
+    img: fragImgData || null, date: new Date().toISOString(), comments: []
+  });
+  closeFragAdd(); persistAndSync(); rFragments();
+}
+
+function openFragDetail(i) {
   const f = D.fragments[i];
-  alert((f.who ? f.who + '：' : '') + (f.text || '分享了一张照片') + '\n\n' + new Date(f.date).toLocaleDateString('zh-CN'));
+  const d = f.date ? new Date(f.date) : new Date();
+  const dateStr = d.toLocaleDateString('zh-CN', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
+  let h = '';
+  if (f.img) h += '<img class="frag-detail-img" src="'+f.img+'" alt="">';
+  h += '<div class="frag-detail-text">' + (f.text ? esc(f.text) : '<span style="color:#ccbbaa">分享了一张照片</span>') + '</div>';
+  h += '<div class="frag-detail-meta">' + esc(f.who||'') + ' · ' + dateStr + '</div>';
+
+  // 评论列表
+  h += '<div class="comment-list">';
+  if (f.comments && f.comments.length > 0) {
+    f.comments.forEach(c => {
+      const cd = c.date ? new Date(c.date) : new Date();
+      h += '<div class="comment-item"><div class="cwho">' + esc(c.who) + '<span class="cdate">' + (cd.getMonth()+1)+'/'+cd.getDate() + ' ' + cd.getHours().toString().padStart(2,'0')+':'+cd.getMinutes().toString().padStart(2,'0') + '</span></div><div>' + esc(c.text) + '</div></div>';
+    });
+  } else {
+    h += '<p style="color:#ccbbaa;font-size:12px;text-align:center;padding:8px;">还没有评论</p>';
+  }
+  h += '</div>';
+
+  // 添加评论
+  h += '<div class="comment-input-row"><input type="text" id="commentInput" placeholder="写评论..."><button onclick="addComment('+i+')">发送</button></div>';
+
+  if (f.who === MY_NAME) {
+    h += '<div style="text-align:center;margin-top:12px;"><button style="background:none;border:none;color:#ccbbaa;font-size:12px;cursor:pointer;" onclick="delFrag('+i+')">删除这条碎片</button></div>';
+  }
+
+  document.getElementById('fragDetailContent').innerHTML = h;
+  document.getElementById('fragDetailModal').style.display = 'flex';
+  document.getElementById('fragDetailModal').onclick = function(e) {
+    if (e.target === document.getElementById('fragDetailModal')) closeFragDetail();
+  };
+}
+function closeFragDetail() { document.getElementById('fragDetailModal').style.display = 'none'; }
+
+function addComment(i) {
+  const input = document.getElementById('commentInput');
+  const v = input.value.trim(); if (!v) return;
+  if (!D.fragments[i].comments) D.fragments[i].comments = [];
+  D.fragments[i].comments.push({ who: MY_NAME, text: v, date: new Date().toISOString() });
+  persistAndSync();
+  openFragDetail(i); // 重新打开以刷新
 }
 function delFrag(i) {
-  if (confirm('删除这条碎片？')) { D.fragments.splice(i, 1); persistAndSync(); rFragments(); }
+  if (confirm('删除这条碎片？')) { D.fragments.splice(i,1); persistAndSync(); rFragments(); closeFragDetail(); }
 }
 
 // ==================== FUND ====================
 const EARNS = [
-  { e:'💪', l:'忍住没吵架', p:2 }, { e:'📹', l:'主动视频', p:3 },
-  { e:'💌', l:'写了真心话', p:3 }, { e:'☀️', l:'主动说早安', p:1 },
+  { e:'💪', l:'忍住没吵架', p:2 },{ e:'📹', l:'主动视频', p:3 },
+  { e:'💌', l:'写了真心话', p:3 },{ e:'☀️', l:'主动说早安', p:1 },
 ];
 const REDEEMS = [
-  { e:'🧋', l:'让对方请奶茶', c:5 }, { e:'💆', l:'让对方按摩', c:8 },
-  { e:'🎬', l:'选下次电影', c:3 }, { e:'🍳', l:'让对方做菜', c:10 },
+  { e:'🧋', l:'让对方请奶茶', c:5 },{ e:'💆', l:'让对方按摩', c:8 },
+  { e:'🎬', l:'选下次电影', c:3 },{ e:'🍳', l:'让对方做菜', c:10 },
 ];
 function rFund() {
   document.getElementById('fundLabelMe').textContent = MY_NAME;
   document.getElementById('fundLabelTa').textContent = PARTNER_NAME || 'TA';
-  document.getElementById('fundMe').innerHTML = (D.funds[MY_NAME] || 0) + '<em> 枚</em>';
-  document.getElementById('fundTa').innerHTML = (PARTNER_NAME ? (D.funds[PARTNER_NAME] || 0) : 0) + '<em> 枚</em>';
-
+  document.getElementById('fundMe').innerHTML = (D.funds[MY_NAME]||0) + '<em> 枚</em>';
+  document.getElementById('fundTa').innerHTML = (PARTNER_NAME ? (D.funds[PARTNER_NAME]||0) : 0) + '<em> 枚</em>';
   document.getElementById('earnTitle').textContent = MY_NAME + ' 赚取';
   document.getElementById('earnGrid').innerHTML = EARNS.map((f,i) => `
     <div class="act-card" onclick="doEarn(${i})"><div class="emo">${f.e}</div><div class="lab">${f.l}</div><div class="pts earn">+${f.p} 枚</div></div>`).join('');
-
   document.getElementById('redeemTitle').textContent = MY_NAME + ' 兑换';
   document.getElementById('redeemGrid').innerHTML = REDEEMS.map((f,i) => `
     <div class="act-card" onclick="doRedeem(${i})"><div class="emo">${f.e}</div><div class="lab">${f.l}</div><div class="pts spend">-${f.c} 枚</div></div>`).join('');
-
   const hist = document.getElementById('fundHist');
-  if (!D.fundHistory || !D.fundHistory.length) {
-    hist.innerHTML = '<p style="color:#c4b5a5;font-size:12px;text-align:center;padding:14px;">还没有记录</p>';
+  if (!D.fundHistory||!D.fundHistory.length) {
+    hist.innerHTML = '<p style="color:#ccbbaa;font-size:12px;text-align:center;padding:14px;">还没有记录</p>';
   } else {
-    hist.innerHTML = D.fundHistory.slice().reverse().slice(0, 15).map(h => `
-      <div class="hist-item"><span>${h.who || ''} ${h.label}</span><span class="val ${h.amount > 0 ? 'earn' : 'spend'}">${h.amount>0?'+':''}${h.amount} 枚</span></div>`).join('');
+    hist.innerHTML = D.fundHistory.slice().reverse().slice(0,15).map(h => `
+      <div class="hist-item"><span>${esc(h.who||'')} ${h.label}</span><span class="val ${h.amount>0?'earn':'spend'}">${h.amount>0?'+':''}${h.amount} 枚</span></div>`).join('');
   }
 }
 function doEarn(i) {
   const f = EARNS[i];
-  if (!D.funds) D.funds = {};
-  if (!D.funds[MY_NAME]) D.funds[MY_NAME] = 0;
+  if (!D.funds) D.funds = {}; if (!D.funds[MY_NAME]) D.funds[MY_NAME] = 0;
   D.funds[MY_NAME] += f.p;
   if (!D.fundHistory) D.fundHistory = [];
   D.fundHistory.push({ who: MY_NAME, label: f.l, amount: f.p, time: Date.now() });
@@ -762,10 +847,10 @@ function doEarn(i) {
 }
 function doRedeem(i) {
   const f = REDEEMS[i];
-  if (!D.funds[MY_NAME] || D.funds[MY_NAME] < f.c) { alert('你的基金不够哦，再攒攒~'); return; }
+  if (!D.funds[MY_NAME]||D.funds[MY_NAME] < f.c) { alert('你的基金不够哦，再攒攒~'); return; }
   D.funds[MY_NAME] -= f.c;
   if (!D.fundHistory) D.fundHistory = [];
-  D.fundHistory.push({ who: MY_NAME, label: f.l + '（TA获得）', amount: -f.c, time: Date.now() });
+  D.fundHistory.push({ who: MY_NAME, label: f.l + (PARTNER_NAME?'（'+PARTNER_NAME+'获得）':'（TA获得）'), amount: -f.c, time: Date.now() });
   persistAndSync(); rFund();
   alert('兑换成功！见面时兑现吧~');
 }
@@ -773,109 +858,61 @@ function doRedeem(i) {
 // ==================== WISHLIST ====================
 function rWishlist() {
   const c = document.getElementById('wishList');
-  if (!D.wishlist || !D.wishlist.length) {
-    c.innerHTML = '<p style="color:#c4b5a5;font-size:12px;text-align:center;padding:18px;">还没有心愿</p>';
-    return;
-  }
-  c.innerHTML = D.wishlist.map((w, i) => {
+  if (!D.wishlist||!D.wishlist.length) { c.innerHTML = '<p style="color:#ccbbaa;font-size:12px;text-align:center;padding:18px;">还没有心愿</p>'; return; }
+  c.innerHTML = D.wishlist.map((w,i) => {
     const tags = { want:'想要', buying:'准备中', bought:'已实现' };
-    const isMine = w.addedBy === MY_NAME;
     return `<div class="wish-row">
-      <div class="wish-icon">${w.emoji || '🎁'}</div>
+      <div class="wish-icon">${w.emoji||'🎁'}</div>
       <div class="wish-body"><div class="wn">${esc(w.name)}</div>
-        <div class="wm">${w.price ? '¥'+w.price : ''}${w.price&&w.link?' · ':''}${w.link?'🔗 有链接':''}${w.addedBy ? ' · 来自'+w.addedBy : ''}</div>
+        <div class="wm">${w.price?'¥'+w.price:''}${w.price&&w.link?' · ':''}${w.link?'🔗 有链接':''}${w.addedBy?' · '+esc(w.addedBy):''}</div>
       </div>
       <span class="wish-tag ${w.status}">${tags[w.status]}</span>
-      ${w.addedBy !== MY_NAME && w.status === 'want' ? '<button class="wish-act" onclick="markBuy(' + i + ')">我准备买</button>' : ''}
-      ${w.addedBy === MY_NAME && w.status === 'buying' ? '<button class="wish-act" style="border-color:#5b3a29;color:#5b3a29;" onclick="markBought(' + i + ')">已实现</button>' : ''}
-      ${w.addedBy === MY_NAME ? '<span style="cursor:pointer;color:#c4b5a5;font-size:14px;margin-left:2px;" onclick="delWish(' + i + ')">✕</span>' : ''}
+      ${w.addedBy!==MY_NAME&&w.status==='want'?'<button class="wish-act" onclick="markBuy('+i+')">准备买</button>':''}
+      ${w.addedBy===MY_NAME&&w.status==='buying'?'<button class="wish-act" style="border-color:#5b3a29;color:#5b3a29" onclick="markBought('+i+')">已实现</button>':''}
+      ${w.addedBy===MY_NAME?'<span style="cursor:pointer;color:#ccbbaa;font-size:14px;margin-left:2px" onclick="delWish('+i+')">✕</span>':''}
     </div>`;
   }).join('');
 }
-function openWish() {
-  document.getElementById('wishModal').style.display = 'flex';
-}
-function closeWish() {
-  document.getElementById('wishModal').style.display = 'none';
-}
+function openWish() { document.getElementById('wishModal').style.display = 'flex'; }
+function closeWish() { document.getElementById('wishModal').style.display = 'none'; }
 function addWish() {
   const nm = document.getElementById('wmName').value.trim(); if (!nm) return alert('请填写心愿');
   if (!D.wishlist) D.wishlist = [];
-  D.wishlist.push({
-    name: nm,
-    emoji: document.getElementById('wmEmoji').value.trim() || '🎁',
-    price: document.getElementById('wmPrice').value.trim(),
-    link: document.getElementById('wmLink').value.trim(),
-    status: 'want',
-    addedBy: MY_NAME
-  });
-  closeWish();
-  persistAndSync(); rWishlist();
+  D.wishlist.push({ name:nm, emoji:document.getElementById('wmEmoji').value.trim()||'🎁', price:document.getElementById('wmPrice').value.trim(), link:document.getElementById('wmLink').value.trim(), status:'want', addedBy:MY_NAME });
+  closeWish(); persistAndSync(); rWishlist();
 }
 function markBuy(i) { D.wishlist[i].status = 'buying'; persistAndSync(); rWishlist(); }
 function markBought(i) { D.wishlist[i].status = 'bought'; persistAndSync(); rWishlist(); }
-function delWish(i) { if (confirm('删除？')) { D.wishlist.splice(i, 1); persistAndSync(); rWishlist(); } }
+function delWish(i) { if (confirm('删除？')) { D.wishlist.splice(i,1); persistAndSync(); rWishlist(); } }
 
 // ==================== SETTINGS ====================
 function openSettings() {
   const c = getSBConfig();
-  document.getElementById('setPairCode').value = c.code || '';
-  document.getElementById('setUrl').value = c.url || '';
-  document.getElementById('setKey').value = c.key || '';
+  document.getElementById('setPairCode').value = c.code||'';
+  document.getElementById('setUrl').value = c.url||'';
+  document.getElementById('setKey').value = c.key||'';
   document.getElementById('settingsName').textContent = MY_NAME;
   document.getElementById('settingsModal').style.display = 'flex';
 }
-function closeSettings() {
-  document.getElementById('settingsModal').style.display = 'none';
-}
+function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
 async function saveSettings() {
   const code = document.getElementById('setPairCode').value.trim();
   const url = document.getElementById('setUrl').value.trim();
   const key = document.getElementById('setKey').value.trim();
   if (!code) { alert('请填写配对码'); return; }
   closeSettings();
-  if (!url || !key) {
-    saveSBConfig('', '', code);
-    updateSync('off');
-    toastMsg('离线模式');
-    return;
-  }
-  updateSync('loading');
-  toastMsg('测试连接...');
+  if (!url||!key) { saveSBConfig('','',code); updateSync('off'); toastMsg('离线模式'); return; }
+  updateSync('loading'); toastMsg('测试连接...');
   let ok = false;
   try {
-    const resp = await fetch(url + '/rest/v1/couples?limit=1', {
-      headers: { 'apikey': key, 'Authorization': 'Bearer ' + key }
-    });
-    ok = resp.ok;
-    if (!ok) {
-      const txt = await resp.text();
-      toastMsg('连接失败 HTTP ' + resp.status);
-    }
-  } catch(e) { toastMsg('网络错误，检查 URL'); }
+    const resp = await fetch(url + '/rest/v1/couples?limit=1', { headers: { 'apikey':key, 'Authorization':'Bearer '+key } });
+    ok = resp.ok; if (!ok) { const t = await resp.text(); toastMsg('连接失败 HTTP '+resp.status); }
+  } catch(e) { toastMsg('网络错误，检查URL'); }
   if (!ok) { updateSync('off'); return; }
-  saveSBConfig(url, key, code);
-  updateSync('on');
-  startAutoSync();
+  saveSBConfig(url, key, code); updateSync('on'); startAutoSync();
   const c = await cloudLoad();
-  if (c) {
-    const id = D.identity;
-    Object.assign(D, c);
-    D.identity = id;
-    // 确保当前用户有字段
-    if (!D.funds) D.funds = {};
-    if (D.funds[MY_NAME] === undefined) D.funds[MY_NAME] = 0;
-    if (!D.moods) D.moods = {};
-    if (D.moods[MY_NAME] === undefined) D.moods[MY_NAME] = null;
-    if (!D.answers) D.answers = {};
-    if (D.answers[MY_NAME] === undefined) D.answers[MY_NAME] = '';
-    localSave();
-    guessPartner();
-    toastMsg('已同步云端数据');
-  } else {
-    await cloudSave();
-    toastMsg('本地数据已上传');
-  }
+  if (c) { Object.assign(D, c); ensureMyFields(); localSave(); guessPartner(); toastMsg('已同步云端数据'); }
+  else { await cloudSave(); toastMsg('本地数据已上传'); }
   renderAll();
 }
 
@@ -884,93 +921,52 @@ function startAutoSync() {
   if (syncTimer) clearInterval(syncTimer);
   syncTimer = setInterval(async () => {
     if (!sbReady()) return;
-    const cloud = await cloudLoad();
-    if (!cloud) return;
-    const my = MY_NAME;
-    const changed = JSON.stringify(cloud) !== JSON.stringify(D);
-    if (changed) {
-      Object.assign(D, cloud);
-      if (!D.funds) D.funds = {};
-      if (D.funds[my] === undefined) D.funds[my] = 0;
-      if (!D.moods) D.moods = {};
-      if (D.moods[my] === undefined) D.moods[my] = null;
-      if (!D.answers) D.answers = {};
-      if (D.answers[my] === undefined) D.answers[my] = '';
-      localSave();
-      guessPartner();
-      renderCurrent();
-      updateSync('on');
+    const cloud = await cloudLoad(); if (!cloud) return;
+    if (JSON.stringify(cloud) !== JSON.stringify(D)) {
+      Object.assign(D, cloud); ensureMyFields(); localSave(); guessPartner(); renderCurrent(); updateSync('on');
     }
   }, 15000);
   document.addEventListener('visibilitychange', async () => {
     if (!document.hidden && sbReady()) {
       const cloud = await cloudLoad();
-      if (cloud) {
-        const my = MY_NAME;
-        Object.assign(D, cloud);
-        if (!D.funds[my] === undefined) D.funds[my] = 0;
-        if (!D.moods[my] === undefined) D.moods[my] = null;
-        if (!D.answers[my] === undefined) D.answers[my] = '';
-        localSave();
-        guessPartner();
-        renderCurrent();
-        updateSync('on');
-      }
+      if (cloud) { Object.assign(D, cloud); ensureMyFields(); localSave(); guessPartner(); renderCurrent(); updateSync('on'); }
     }
   });
 }
 
-// ==================== INIT ====================
-function initAfterLogin() {
-  guessPartner();
-  // 确保数据结构存在
-  if (!D.funds) D.funds = {};
-  if (D.funds[MY_NAME] === undefined) D.funds[MY_NAME] = 0;
-  if (!D.moods) D.moods = {};
-  if (D.moods[MY_NAME] === undefined) D.moods[MY_NAME] = null;
-  if (!D.answers) D.answers = {};
-  if (D.answers[MY_NAME] === undefined) D.answers[MY_NAME] = '';
+function ensureMyFields() {
+  if (!D.funds) D.funds = {}; if (D.funds[MY_NAME] === undefined) D.funds[MY_NAME] = 0;
+  if (!D.moods) D.moods = {}; if (D.moods[MY_NAME] === undefined) D.moods[MY_NAME] = null;
+  if (!D.answers) D.answers = {}; if (D.answers[MY_NAME] === undefined) D.answers[MY_NAME] = '';
   if (!D.plans) D.plans = [];
   if (!D.fragments) D.fragments = [];
   if (!D.fundHistory) D.fundHistory = [];
   if (!D.wishlist) D.wishlist = [];
+}
 
-  const c = getSBConfig();
+// ==================== INIT ====================
+function initAfterLogin() {
+  guessPartner(); ensureMyFields();
   if (sbReady()) {
     updateSync('loading');
     cloudLoad().then(cloud => {
-      if (cloud) {
-        Object.assign(D, cloud);
-        if (!D.funds[MY_NAME] === undefined) D.funds[MY_NAME] = 0;
-        localSave();
-        guessPartner();
-        updateSync('on');
-      } else {
-        cloudSave().then(ok => updateSync(ok?'on':'off'));
-      }
-      renderAll();
-      document.getElementById('nameTag').textContent = MY_NAME;
+      if (cloud) { Object.assign(D, cloud); ensureMyFields(); localSave(); guessPartner(); updateSync('on'); }
+      else { cloudSave().then(ok => updateSync(ok?'on':'off')); }
+      renderAll(); document.getElementById('nameTag').textContent = MY_NAME;
     });
     startAutoSync();
-  } else {
-    updateSync('off');
-    renderAll();
-    document.getElementById('nameTag').textContent = MY_NAME;
-  }
+  } else { updateSync('off'); renderAll(); document.getElementById('nameTag').textContent = MY_NAME; }
   document.getElementById('pg-countdown').classList.add('show');
 }
 
 function init() {
   const savedName = localStorage.getItem(LC_MY);
   if (savedName) {
-    MY_NAME = savedName;
+    MY_NAME = savedName; localLoad();
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('nameTag').textContent = savedName;
-    localLoad();
     initAfterLogin();
-  } else {
-    document.getElementById('loginScreen').style.display = 'flex';
-  }
+  } else { document.getElementById('loginScreen').style.display = 'flex'; }
 }
 
 function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
