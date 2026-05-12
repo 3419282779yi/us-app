@@ -760,20 +760,37 @@ async function cloudSave() {
   if (!sbReady()) return false;
   const cfg = getSBConfig();
   try {
-    const resp = await fetch(cfg.url + '/rest/v1/couples', {
-      method: 'POST',
-      headers: {
-        'apikey': cfg.key,
-        'Authorization': 'Bearer ' + cfg.key,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates'
-      },
-      body: JSON.stringify({
-        pair_code: cfg.code,
-        data: D,
-        updated_at: new Date().toISOString()
-      })
+    // 先查是否存在
+    const check = await fetch(cfg.url + '/rest/v1/couples?select=id&pair_code=eq.' + encodeURIComponent(cfg.code) + '&limit=1', {
+      headers: { 'apikey': cfg.key, 'Authorization': 'Bearer ' + cfg.key }
     });
+    const rows = check.ok ? await check.json() : [];
+    const body = { pair_code: cfg.code, data: D, updated_at: new Date().toISOString() };
+    let resp;
+    if (rows && rows.length > 0) {
+      // 已存在 → 更新
+      resp = await fetch(cfg.url + '/rest/v1/couples?pair_code=eq.' + encodeURIComponent(cfg.code), {
+        method: 'PATCH',
+        headers: {
+          'apikey': cfg.key,
+          'Authorization': 'Bearer ' + cfg.key,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+    } else {
+      // 不存在 → 插入
+      resp = await fetch(cfg.url + '/rest/v1/couples', {
+        method: 'POST',
+        headers: {
+          'apikey': cfg.key,
+          'Authorization': 'Bearer ' + cfg.key,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(body)
+      });
+    }
     return resp.ok;
   } catch(e) { return false; }
 }
